@@ -1,6 +1,16 @@
 <?php
 
-require 'flight/Flight.php';
+// Require flight
+require 'vendor/flight/flight/Flight.php';
+
+// Set the search path for flight registered classes
+Flight::path('classes');
+
+// Register classes with flight
+Flight::register('artmoi', 'Artmoi_Request');
+
+// Set the view folder for flight
+Flight::set('flight.views.path', 'views');
 
 
 class ArtMoi_WP{
@@ -13,6 +23,9 @@ class ArtMoi_WP{
         wp_enqueue_style('wp-artmoi-style',plugins_url('css/wp-artmoi-style.css',__FILE__));
         register_activation_hook( __FILE__, array($this, 'wpa_install'));
         register_deactivation_hook(__FILE__, array($this, 'wpa_uninstall'));
+
+
+
     }
 
     /* actions perform at loading of admin menu*/
@@ -56,7 +69,28 @@ class ArtMoi_WP{
 
 
     }
+
+    // EXAMPLE ..
+    public function callExample( $page, $limit )
+    {
+        $artmoi = Flight::artmoi();
+
+        $artmoi->params('page', $page);
+        $artmoi->params('limit', $limit);
+
+        $controller = 'user';
+        $action = 'images';
+
+        $response = $artmoi->call($controller, $action);
+
+        Flight::view()->set('results', $response->results() );
+
+        Flight::render('artworkGrid');
+
+        //print_r($response);
+    }
+
+
 }
 
 new ArtMoi_WP();
-?>

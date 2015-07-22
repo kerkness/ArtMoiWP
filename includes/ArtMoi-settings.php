@@ -1,7 +1,4 @@
 
-
-
-
 <div class="wrap">
   <h2> Artmoi WP Settings</h2>
 
