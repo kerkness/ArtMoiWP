@@ -1,16 +1,18 @@
 <?php
 
 // Require flight
-require 'vendor/flight/flight/Flight.php';
+require dirname(__FILE__).'/vendor/flight/flight/Flight.php';
 
 // Set the search path for flight registered classes
-Flight::path('classes');
+Flight::path( dirname(__FILE__).'/classes');
+
+// Set the view folder for flight
+Flight::set('flight.views.path',  dirname(__FILE__).'/views');
 
 // Register classes with flight
 Flight::register('artmoi', 'Artmoi_Request');
+Flight::register('controller', 'Artmoi_Controller');
 
-// Set the view folder for flight
-Flight::set('flight.views.path', 'views');
 
 
 class ArtMoi_WP{
@@ -23,8 +25,6 @@ class ArtMoi_WP{
         wp_enqueue_style('wp-artmoi-style',plugins_url('css/wp-artmoi-style.css',__FILE__));
         register_activation_hook( __FILE__, array($this, 'wpa_install'));
         register_deactivation_hook(__FILE__, array($this, 'wpa_uninstall'));
-
-
 
     }
 
@@ -51,10 +51,16 @@ class ArtMoi_WP{
         $screen = get_current_screen();
 
         if(strpos($screen->base, 'ArtMoi-settings') !== false){
-            include (dirname(__FILE__). '/includes/ArtMoi-settings.php');
+
+            Flight::controller()->settings();
+
+            //include(dirname(__FILE__) . '/includes/ArtMoi-settings.php');
         }
         else{
-            include (dirname(__FILE__). '/includes/ArtMoi-dashboard.php');
+
+            Flight::controller()->dashboard();
+
+            //include(dirname(__FILE__) . '/includes/ArtMoi-dashboard.php');
         }
     }
 
@@ -70,27 +76,9 @@ class ArtMoi_WP{
 
     }
 
-    // EXAMPLE ..
-    public function callExample( $page, $limit )
-    {
-        $artmoi = Flight::artmoi();
-
-        $artmoi->params('page', $page);
-        $artmoi->params('limit', $limit);
-
-        $controller = 'user';
-        $action = 'images';
-
-        $response = $artmoi->call($controller, $action);
-
-        Flight::view()->set('results', $response->results() );
-
-        Flight::render('artworkGrid');
-
-        //print_r($response);
-    }
 
 
 }
+
 
 new ArtMoi_WP();

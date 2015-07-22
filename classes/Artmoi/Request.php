@@ -19,15 +19,12 @@ class ArtMoi_Request{
      * @var
      */
     public $password;
-    /**
-     * @var
-     */
-    public $response;
 
     /**
+     * TODO: This needs to change to https when we have an SSL certificate for api.artmoi.me enabled
      * @var string
      */
-    public $baseURI = 'https://api.artmoi.me';
+    public $baseURI = 'http://api.artmoi.me';
 
     /**
      * @var string
@@ -106,6 +103,7 @@ class ArtMoi_Request{
             // Record the  parameters for building the api call.
             $uriParts = array($this->baseURI, $this->version, $controller, $action);
 
+
             // Add id if provided
             if( $id ){
                 $uriParts[] = $id;
@@ -113,6 +111,8 @@ class ArtMoi_Request{
 
             // Build the uri
             $uri = implode('/', $uriParts);
+
+            error_log($uri);
 
             // Add the apiKey to the params
             $this->params('apiKey', $this->apiKey);
