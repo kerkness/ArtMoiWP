@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * @package ArtMoi Wordpress Plugin
+ * @version 1.0
+ */
+/*
+Plugin Name: ArtMoi Wordpress Plugin
+Description: Plugin for syncing your ArtMoi account with Wordpress Media Files
+Version: 1.0
+Author URI: http://artmoi.com
+*/
+
 // Require flight
 require dirname(__FILE__).'/vendor/flight/flight/Flight.php';
 
@@ -10,26 +21,30 @@ Flight::path( dirname(__FILE__).'/classes');
 Flight::set('flight.views.path',  dirname(__FILE__).'/views');
 
 // Register classes with flight
-Flight::register('artmoi', 'Artmoi_Request');
+Flight::register('request', 'Artmoi_Request');
+Flight::register('response','Artmoi_response');
 Flight::register('controller', 'Artmoi_Controller');
 
 
 
 class ArtMoi_WP{
     //constructor
-    function __construct(){
-
+    public function __construct()
+    {
 
         add_action('admin_menu', array($this, 'wpa_add_menu'));
-
-        wp_enqueue_style('wp-artmoi-style',plugins_url('css/wp-artmoi-style.css',__FILE__));
+        add_action('admin_init',array($this,'register_mysettings'));
+        wp_enqueue_script('admin_js_bootstrap_hack', plugins_url('ArtMoiWP/scripts/bootstrap-hack.js'));
+        wp_enqueue_script('admin_js_bootstrap', plugins_url('ArtMoiWP/scripts/bootstrap.js'));
+        //wp_enqueue_style('wp-artmoi-style',plugins_url('css/style.css',__FILE__)); // TODO: MAKE IT PRETTY!
         register_activation_hook( __FILE__, array($this, 'wpa_install'));
         register_deactivation_hook(__FILE__, array($this, 'wpa_uninstall'));
 
     }
 
     /* actions perform at loading of admin menu*/
-    function wpa_add_menu(){
+    public function wpa_add_menu()
+    {
         add_menu_page( 'ArtMoi', 'ArtMoi', 'manage_options', 'ArtMoi-dashboard', array(
             __CLASS__,
             'wpa_page_file_path'
@@ -47,38 +62,33 @@ class ArtMoi_WP{
     }
 
     /* actions perform at loading of menu pages */
-    function wpa_page_file_path(){
+    public function wpa_page_file_path()
+    {
         $screen = get_current_screen();
 
         if(strpos($screen->base, 'ArtMoi-settings') !== false){
-
             Flight::controller()->settings();
-
-            //include(dirname(__FILE__) . '/includes/ArtMoi-settings.php');
         }
         else{
-
             Flight::controller()->dashboard();
-
-            //include(dirname(__FILE__) . '/includes/ArtMoi-dashboard.php');
         }
     }
 
+    /* Register options */
+    public function register_mysettings()
+    {
+        register_setting('artmoiwp_apikey','artmoiwp_apikey');
 
+    }
     /* actions perform on activation of plugin*/
-    function wpa_install(){
-
+    public function wpa_install()
+    {
     }
 
     /*actions perform on deactivation of plugin*/
-    function wpa_uninstall(){
-
-
+    public function wpa_uninstall()
+    {
     }
-
-
-
 }
-
 
 new ArtMoi_WP();

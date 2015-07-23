@@ -8,23 +8,15 @@
 class ArtMoi_Request{
 
     /**
-     * @var
+     * @var string
      */
     public $apiKey;
-    /**
-     * @var
-     */
-    public $email;
-    /**
-     * @var
-     */
-    public $password;
 
     /**
      * TODO: This needs to change to https when we have an SSL certificate for api.artmoi.me enabled
      * @var string
      */
-    public $baseURI = 'http://api.artmoi.me';
+    public $baseURI = 'http://api.omona.me';
 
     /**
      * @var string
@@ -41,23 +33,10 @@ class ArtMoi_Request{
      */
     public $response;
 
-    /**
-     * @param $apiKey
-     * @param $email
-     * @param $password
-     */
-    //public function __construct($apiKey, $email, $password)
-    /**
-     *
-     */
     public function __construct()
     {
         // TODO: load the api key from wp-settings
-        $this->apiKey = $apiKey;
-
-        // TODO: will probably not need these properties as authorization is provided with the apikey
-        $this->email = $email;
-        $this->password = $password;
+        $this->apiKey = get_option('artmoiwp_apikey');
 
         // Create the response object
         $this->response = new Artmoi_Response();
@@ -115,10 +94,22 @@ class ArtMoi_Request{
             error_log($uri);
 
             // Add the apiKey to the params
-            $this->params('apiKey', $this->apiKey);
+            $this->params('key', $this->apiKey);
 
-            // Use the wordpress remote get and remote body methods
-            $json = wp_remote_retrieve_body( wp_remote_post( $uri, $this->params() ) );
+            // CURL Arguments
+            $args = array(
+                'method' => 'POST',
+                'timeout' => 45,
+                'redirection' => 5,
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => array(),
+                'body' => $this->params(),
+                'cookies' => array()
+            );
+
+            // Use the wordpress remote post and remote body methods
+            $json = wp_remote_retrieve_body( wp_remote_post( $uri, $args ) );
 
             $this->response = new Artmoi_Response( $json );
         }
@@ -138,8 +129,5 @@ class ArtMoi_Request{
 
         return $this->response;
     }
-
-
-
 
 }
