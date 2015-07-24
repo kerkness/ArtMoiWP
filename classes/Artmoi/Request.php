@@ -96,6 +96,11 @@ class ArtMoi_Request{
             // Add the apiKey to the params
             $this->params('key', $this->apiKey);
 
+            foreach( $this->params() as $k => $v )
+            {
+                error_log("calling api with param $k => $v");
+            }
+
             // CURL Arguments
             $args = array(
                 'method' => 'POST',

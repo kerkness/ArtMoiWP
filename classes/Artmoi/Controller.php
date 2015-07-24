@@ -2,8 +2,6 @@
 
 class Artmoi_Controller
 {
-
-
     public function settings()
     {
 
@@ -17,7 +15,6 @@ class Artmoi_Controller
                 $apiKey = $_POST['apiKey'];
                // TODO: save apiKey to wordpress settings using name artmoiwp_apikey
                 update_option('artmoiwp_apikey',$apiKey);
-
             }
         }else{
             $apiKey = $this->artmoiwp_apikey;
@@ -33,22 +30,18 @@ class Artmoi_Controller
 
     public function dashboard()
     {
+        wp_enqueue_script('gridContainer', plugins_url('ArtMoiWP/scripts/gridContainer.js'));
 
         $results = $this->getRecentCreations(1, 30);
         $reports = $this->getUserReports();
 
+        Flight::view()->set('apiKey', get_option('artmoiwp_apikey'));
         Flight::view()->set('reports', $reports);
-
-
         Flight::view()->set('gridTitle', __('Recent Creations'));
-
         Flight::render('admin/artworkGrid', array('artwork' => $results, 'reports' => $reports), 'grid');
-
         Flight::render('admin/dashboard');
 
     }
-
-
 
     public function getUserReports()
     {
@@ -59,7 +52,6 @@ class Artmoi_Controller
         $controller = 'reports';
 
         $response = $artmoi->call($controller);
-
 
         return $response->results();
     }
@@ -79,5 +71,6 @@ class Artmoi_Controller
 
         return $response->results();
     }
+
 
 }

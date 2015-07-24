@@ -24,7 +24,7 @@ Flight::set('flight.views.path',  dirname(__FILE__).'/views');
 Flight::register('request', 'Artmoi_Request');
 Flight::register('response','Artmoi_response');
 Flight::register('controller', 'Artmoi_Controller');
-
+Flight::register('images','ArtMoi_Images');
 
 
 class ArtMoi_WP{
@@ -65,12 +65,21 @@ class ArtMoi_WP{
     public function wpa_page_file_path()
     {
         $screen = get_current_screen();
-
-        if(strpos($screen->base, 'ArtMoi-settings') !== false){
+        $is_apikey = get_option('artmoiwp_apikey');
+        // stay on the setting page until a visitor enters the api key
+        if(is_null($is_apikey)){
+            echo "<h3>Please enter an ArtMoi API Key</h3>";
             Flight::controller()->settings();
         }
         else{
-            Flight::controller()->dashboard();
+            if(strpos($screen->base, 'ArtMoi-settings') !== false)
+            {
+                Flight::controller()->settings();
+            }
+            else
+            {
+                Flight::controller()->dashboard();
+            }
         }
     }
 
@@ -80,6 +89,7 @@ class ArtMoi_WP{
         register_setting('artmoiwp_apikey','artmoiwp_apikey');
 
     }
+
     /* actions perform on activation of plugin*/
     public function wpa_install()
     {

@@ -7,7 +7,11 @@
     <table>
      <tr>
          <td>
+             <h3>ArtMoi API Key</h3>
+
        <!-- TODO: Add "Where do I find my API Key? instruction" -->
+             <a href="http://omona.me/integrations" target="_blank">Find an API Key for your Wordpress Plugin</a> <br/>
+
         <? settings_fields('artmoiwp_apikey'); ?>
         <? do_settings_sections('artmoiwp_apikey'); ?>
         ArtMoi API Key:
