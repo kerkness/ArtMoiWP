@@ -73,6 +73,7 @@ class Artmoi_Response
      */
     public function results( $objects = NULL )
     {
+
         if( ! is_null($objects) ) {
             $this->results = $objects;
         }

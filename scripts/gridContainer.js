@@ -3,26 +3,35 @@
     pageNumber = 1;
 
     $(document.body).on('click', '.thumbnail', function( event ){
-
+        // prevent default click behavour
         event.preventDefault();
-        //alert( $(this).attr('objectId') );
 
-        objectSelected = $(this).children('.objectSelected');
+        // get the objectSelected checkbox element
+        objectSelected = $(this).find('.objectSelected');
+        //dataHolder = $(this).find('.objectData');
 
-        if( objectSelected.val().length )
-        {
-            $(this).find('img-responsive').removeClass('.img-circle');
+        objectData = jQuery.parseJSON( $(this).find('.objectData').val());
 
-            objectSelected.val("");
+        // Toggle the check box
+        objectSelected.prop("checked", ! objectSelected.prop("checked"));
 
-        } else {
+        $.post(ajaxurl,
+            {
+                action: 'sync_creation',
+                syncImage: (objectData.images[0].imageFileSized) ? objectData.images[0].imageFileSized : '',
+                syncObjectId: (objectData.objectId) ? objectData.objectId : '',
+                syncTitle: (objectData.title) ? objectData.title : '',
+                syncCaption: (objectData.caption) ? objectData.caption : '',
+                syncLocation: (objectData.creationDate.year) ? objectData.creationDate.year : '',
 
-            objectSelected.val($(this).attr('objectId'));
-            $(this).find('img-responsive').addClass('.img-circle');
+                //syncArtist: objectData.user.creators[0].displayName,
+                syncMedium: (objectData.medium.name) ? objectData.medium.name : '',
+            },
+            function(response) {
 
+                alert(response);
 
-        }
-
+            },'json');
     });
 
     $("#loadMore").click(function( event )
@@ -35,8 +44,6 @@
         apiKey = $("#hiddenKey").val();
 
         //alert(pageNumber);
-
-
 
         $.post('http://api.omona.me/1.0/creation/user',
             {
@@ -59,14 +66,11 @@
                     // Find the thumbnail and add src value
                     block.find('.img-responsive').attr('src',data.results[i].images[0].imageFileThumbnail);
 
-                    // Set the thumbnail objectId attribute
-                    block.find('.thumbnail').attr('objectId', data.results[i].objectId);
-
                     // Find the objectSelected field and set the id.
                     block.find('.objectSelected').attr('id', data.results[i].objectId);
 
                     // Set the default value to not selected
-                    block.find('.objectSelected').attr('value', '');
+                    block.find('.objectSelected').attr('value', data.results[i].objectId);
 
                     // Append this block
                     block.insertAfter('.omitem:last');

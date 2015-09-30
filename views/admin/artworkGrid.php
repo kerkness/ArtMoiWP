@@ -1,32 +1,40 @@
-<h3><?= $gridTitle ?></h3>
-    <div id="thumbnails" class="row">
 
-            <? foreach($artwork as $art) : ?>
+<div id="thumbnails" class="row">
+    <? if (( !($results)) || !($pageType)) : ?>
+        <div class="alert alert-warning" role="alert">Item not Found</div>
+
+    <? else :?>
+
+        <? if (($pageType == "report") || ($pageType == "all")) : ?>
+            <? foreach( $results as $result) : ?>
                 <div class="omitem col-sm-2">
-                    <a href="#" class="thumbnail" objectId="<?= $art->objectId ?>">
-                        <img class="img-responsive" src="<?= $art->images[0]->imageFileThumbnail ?>">
-                        <input id="<?= $art->objectId ?>" type="hidden" class="objectSelected" value="">
+                    <a href="#" class="thumbnail">
+                        <img class="img-responsive" src="<?= $result->images[0]->imageFileThumbnail ?>">
+                        <input type="hidden" name="objectData" class="objectData" value="<?= htmlspecialchars(json_encode($result))?>" >
+                        <?if($pageType == "all") : ?>
+                            <div class="caption"><?=substr($result->title,0,15)?></div>
+                        <?endif?>
                     </a>
                 </div>
             <? endforeach ?>
 
-   </div>
+        <? elseif ($pageType == "collection") : ?>
+            <?if($results->items) : ?>
+                <? foreach ($results->items as $result) : ?>
+                    <? if(!$result->isPrivate) : ?> <!-- Do not display private items -->
+                        <div class="omitem col-sm-2">
+                            <a href="#" class="thumbnail">
+                                <img class="img-responsive" src="<?= $result->images[0]->imageFileThumbnail ?>" >
+                                <input type="hidden" name="objectData" class="objectData" value="<?= htmlspecialchars(json_encode($result)) ?> ">
+                            </a>
+                        </div>
+                    <? endif ?>
+                <? endforeach ?>
+            <?endif?>
 
-
-
-
-<div class="row">
-    <div class="col-md-12">
-        <a id="loadMore" class="btn btn-default" href="#">More</a>
-        <img class="loadingGif btn btn-default" id="loadingGif" src="images/loading.gif" style="display:none"/>
-        <input type="hidden" id="hiddenKey" value="<?= $apiKey ?>" ?>
-        <p>&nbsp;</p>
-    </div>
+        <? endif ?>
+    <? endif ?>
 </div>
 
 
 
-
-<pre>
-        <? print_r($art) ?>
-</pre>

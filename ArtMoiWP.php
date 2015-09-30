@@ -21,84 +21,302 @@ Flight::path( dirname(__FILE__).'/classes');
 Flight::set('flight.views.path',  dirname(__FILE__).'/views');
 
 // Register classes with flight
-Flight::register('request', 'Artmoi_Request');
+Flight::register('artmoi', 'Artmoi_Request');
 Flight::register('response','Artmoi_response');
 Flight::register('controller', 'Artmoi_Controller');
-Flight::register('images','ArtMoi_Images');
 
 
-class ArtMoi_WP{
-    //constructor
+
+class ArtMoi_WP
+{
+    /**
+     * constructor
+     */
     public function __construct()
     {
+        // Load admin menu and pages
+        add_action('admin_menu', array($this, 'load_admin_menu'));
 
-        add_action('admin_menu', array($this, 'wpa_add_menu'));
-        add_action('admin_init',array($this,'register_mysettings'));
-        wp_enqueue_script('admin_js_bootstrap_hack', plugins_url('ArtMoiWP/scripts/bootstrap-hack.js'));
-        wp_enqueue_script('admin_js_bootstrap', plugins_url('ArtMoiWP/scripts/bootstrap.js'));
-        //wp_enqueue_style('wp-artmoi-style',plugins_url('css/style.css',__FILE__)); // TODO: MAKE IT PRETTY!
-        register_activation_hook( __FILE__, array($this, 'wpa_install'));
-        register_deactivation_hook(__FILE__, array($this, 'wpa_uninstall'));
+        // Add admin scripts
+        add_action('admin_enqueue_scripts',array($this, 'add_style_into_admin'));
 
+        // Register setting options
+        add_action('admin_init', array($this, 'register_artmoi_settings'));
+
+        // Unlimit the number of images on a page or post
+        add_action('pre_get_posts', array($this, 'no_limit_posts'));
+
+        // Set the ajax call for creating the media file
+        add_action('wp_ajax_sync_items', array($this, 'sync_items'));
+
+        // Add a meta box
+        add_action('add_meta_boxes', array($this, 'add_custom_meta'));
+
+        // Add a hook to save_post
+        add_action('save_post', array($this, 'save_meta'));
+
+        // Load css into the fornt-end
+        add_action('wp_enqueue_scripts',array($this,'add_style'));
+
+        // Create Short Codes to load a real time list of items from ArtMoi
+        add_shortcode('am_items', array($this, 'shortcode_items'));
+
+        // Create Short Code for displaying an Alphabetical Menu
+        add_shortcode('am_menu_alpha', array($this, 'shortcode_menu_alpha'));
+
+        // Create Short Code for displaying an Alphabetical Menu
+        add_shortcode('am_menu_date', array($this, 'shortcode_menu_date'));
+
+        // Add the_content filter
+        add_filter('the_content', array($this, 'get_the_content'));
+
+        // Install Hooks.
+        register_activation_hook(__FILE__, array($this, 'install_artmoi_plugin'));
+
+        // Uninstall Hook
+        register_deactivation_hook(__FILE__, array($this, 'uninstall_artmoi_plugin'));
     }
 
-    /* actions perform at loading of admin menu*/
-    public function wpa_add_menu()
+    /**
+     * Load admin menu & sub menu
+     */
+    public function load_admin_menu()
     {
-        add_menu_page( 'ArtMoi', 'ArtMoi', 'manage_options', 'ArtMoi-dashboard', array(
-            __CLASS__,
-            'wpa_page_file_path'
-        ), plugins_url('images/ArtMoi-Logo.png', __FILE__),'1.0.0');
+        add_menu_page('ArtMoi', 'ArtMoi', 'manage_options', 'artmoi-lists', array(__CLASS__, 'load_menu_pages'), plugins_url('images/ArtMoi-Logo.png', __FILE__), '1.2.0');
+        add_submenu_page('artmoi-lists', 'ArtMoi' . ' Lists', ' Lists', 'manage_options', 'artmoi-lists', array(__CLASS__, 'load_menu_pages'));
+        add_submenu_page('artmoi-lists', 'ArtMoi' . ' Settings', 'Settings', 'manage_options', 'artmoi-settings', array(__CLASS__, 'load_menu_pages'));
 
-        add_submenu_page( 'ArtMoi-dashboard', 'ArtMoi' . ' Dashboard', ' Dashboard', 'manage_options', 'ArtMoi-dashboard', array(
-            __CLASS__,
-            'wpa_page_file_path'
-        ));
-
-        add_submenu_page( 'ArtMoi-dashboard', 'ArtMoi' . ' Settings', 'Settings', 'manage_options', 'ArtMoi-settings', array(
-            __CLASS__,
-            'wpa_page_file_path'
-        ));
+        // This view-report page will not in admin menu
+        add_submenu_page(null, 'ArtMoi' . ' Report Details', 'Report Details', 'manage_options', 'artmoi-view-items', array(__CLASS__, 'load_menu_pages'));
     }
 
-    /* actions perform at loading of menu pages */
-    public function wpa_page_file_path()
+    /**
+     * Load scripts into admin page
+     */
+    public function add_style_into_admin()
     {
+        // Load bootstrap scripts
+        wp_enqueue_script('admin_js_bootstrap_hack', plugins_url('ArtMoiWP/scripts/bootstrap-hack.js'), array('jquery'));
+        wp_enqueue_script('admin_js_bootstrap', plugins_url('ArtMoiWP/scripts/bootstrap.js'), array('jquery'));
+    }
+
+    /**
+     * Load menu pages
+     */
+    public function load_menu_pages()
+    {
+        Flight::controller()->before();
+
         $screen = get_current_screen();
-        $is_apikey = get_option('artmoiwp_apikey');
-        // stay on the setting page until a visitor enters the api key
-        if(is_null($is_apikey)){
-            echo "<h3>Please enter an ArtMoi API Key</h3>";
+        $isApikey = get_option('artmoiwp_apikey');
+
+        // Stay on the setting page until a user enters the api key
+        if(is_null($isApikey) || $isApikey == "")
+        {
             Flight::controller()->settings();
         }
-        else{
-            if(strpos($screen->base, 'ArtMoi-settings') !== false)
+        else
+        {
+            if(strpos($screen->base, 'artmoi-settings') !== false)
             {
+                // Load the setting page
                 Flight::controller()->settings();
             }
-            else
+            else if(strpos($screen->base, 'artmoi-view-items') !== false)
             {
-                Flight::controller()->dashboard();
+                // Load the viewItems page
+                Flight::controller()->viewItems();
+            }
+            else if(strpos($screen->base, 'artmoi-lists') !== false){
+                // Load the list page
+                Flight::controller()->lists();
             }
         }
     }
 
-    /* Register options */
-    public function register_mysettings()
+    /**
+     * Register ArtMoi options
+     */
+    public function register_artmoi_settings()
     {
         register_setting('artmoiwp_apikey','artmoiwp_apikey');
+        register_setting('artmoiwp_syncedReports','artmoiwp_syncedReports');
+        register_setting('artmoiwp_syncedCollections','artmoiwp_syncedCollections');
+        register_setting('artmoiwp_allitems','artmoiwp_allitems');
+    }
+
+    public function no_limit_posts($query)
+    {
+        update_option('posts_per_page', '-1');
+        update_option('page_for_posts','-1');
+    }
+
+    /**
+     * Sync recent creation items
+     */
+//    public function sync_creation()
+//    {
+//        Flight::controller()->syncCreation( $_POST );
+//    }
+
+    public function shortcode_items( $atts )
+    {
+        $atts = shortcode_atts(
+            array(
+                'limit' => 30,
+                'orderby' => 'createdAt',
+                'orderdir' => 'descending',
+            ), $atts, 'am_items' );
+
+        $controller = Flight::controller();
+
+        //error_log("Loading wordpres PostID $postId");
+
+        return $controller->getItems($atts);
+
+        //return "Shortcode ITems";
+    }
+
+    public function shortcode_menu_alpha( $atts )
+    {
+        $atts = shortcode_atts(
+            array(
+                'range_start' => 'a',
+                'range_end' => 'z',
+            ), $atts, 'am_menu_alpha' );
+
+        return Flight::view()->render('frontend/menu/alpha', array('atts' => $atts));
+    }
+
+    public function shortcode_menu_date( $atts )
+    {
+        wp_reset_postdata();
+        global $post;
+        $link = get_permalink( $post->ID );
+
+        $atts = shortcode_atts(
+            array(
+                'range_start' => '1990',
+                'range_end' => '2015',
+                'groupby' => 0,
+            ), $atts, 'am_menu_date' );
+
+        $dates = array();
+
+        if( $atts['groupby'] )
+        {
+            $groupby = $atts['groupby'];
+            $start = $atts['range_start'];
+            $end = $atts['range_end'];
+
+            $last = $start;
+
+            while($last <= $end)
+            {
+                $set_start = $last;
+                $set_end = $last + $groupby;
+
+                if( $set_end > $end )
+                {
+                    $set_end = $end;
+                }
+
+                $dates[] = $set_start.' - '.$set_end;
+                //$dates[] = $set_end;
+
+                $last = $set_end + 1;
+            }
+        }
+        else
+        {
+            $dates = range($atts['range_start'], $atts['range_end']);
+        }
+
+
+        return Flight::view()->render('frontend/menu/date', array('dates' => $dates, 'link'=>$link));
+    }
+
+    /**
+     * Sync selected items
+     */
+    public function sync_items()
+    {
+//        Flight::controller()->before();
+        Flight::controller()->syncCreation( $_POST );
+    }
+
+    /**
+     * Save meta values from input
+     * @param $post_id
+     */
+    public function save_meta($postId)
+    {
+        Flight::controller()->saveOrDeleteMetaValue($postId);
+        $detail = Flight::controller()->searchData($postId,"detail");
+
+        // Call AddTag only when in post edit page
+        $screen = get_current_screen();
+        if(strpos($screen->post_type, 'post') !== false)
+        {
+            Flight::controller()->addTag($postId,$detail);
+        }
+
 
     }
 
-    /* actions perform on activation of plugin*/
-    public function wpa_install()
+    /**
+     * Add style and script into front-end
+     */
+    public function add_style()
+    {
+        // Load style into front-end
+        wp_enqueue_style('bootstrap-style', plugins_url('css/bootstrap.min.css', __FILE__));
+
+        // Load script into front-end
+        wp_enqueue_script('admin_js_bootstrap', plugins_url('ArtMoiWP/scripts/bootstrap.js'), array('jquery'));
+    }
+
+    /**
+     * Get the selected report or collection item image urls and
+     * Update a post or page with them
+     * @param $theContent
+     * @return mixed
+     */
+    public function get_the_content( $theContent )
+    {
+        global $post;
+        $postId = $post->ID; // the post ID in edit , not published
+
+        $thumbnail = Flight::controller()->searchData($postId, "thumbnail");
+        $image = Flight::controller()->searchData($postId, "image");
+        $detail = Flight::controller()->searchData($postId, "detail");
+
+        return Flight::controller()->getImages($postId, $theContent,  $detail, $image, $thumbnail);
+    }
+
+    /**
+     * Create a custom meta box
+     */
+    public function add_custom_meta()
+    {
+       Flight::controller()->before();
+       Flight::controller()->addCustomMeta();
+    }
+
+    /**
+     * Actions perform on activation of ArtMoi plugin
+     */
+    public function install_artmoi_plugin()
     {
     }
 
-    /*actions perform on deactivation of plugin*/
-    public function wpa_uninstall()
+    /**
+     * Actions perform on deactivation of ArtMoi plugin
+     */
+    public function uninstall_artmoi_plugin()
     {
     }
+
 }
 
 new ArtMoi_WP();

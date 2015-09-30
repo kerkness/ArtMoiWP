@@ -4,6 +4,7 @@
 /**
  * Class ArtMoi_Request
  *
+ * Request object
  */
 class ArtMoi_Request{
 
@@ -35,12 +36,10 @@ class ArtMoi_Request{
 
     public function __construct()
     {
-        // TODO: load the api key from wp-settings
         $this->apiKey = get_option('artmoiwp_apikey');
 
         // Create the response object
         $this->response = new Artmoi_Response();
-
     }
 
     /**
@@ -71,7 +70,7 @@ class ArtMoi_Request{
      * @param null $id
      * @return Artmoi_Response
      */
-    public function call( $controller, $action = 'index', $id = NULL )
+    public function call( $controller, $action = 'index', $id = NULL, $queryString = NULL )
     {
         if( ! $controller )
         {
@@ -91,7 +90,13 @@ class ArtMoi_Request{
             // Build the uri
             $uri = implode('/', $uriParts);
 
-            error_log($uri);
+//            if($queryString){
+//             //   $query[] = $queryString;
+//                $string = "?".$queryString;
+//                $uri .= $string;
+//            }
+
+            error_log("uri ".$uri);
 
             // Add the apiKey to the params
             $this->params('key', $this->apiKey);
@@ -113,12 +118,12 @@ class ArtMoi_Request{
                 'cookies' => array()
             );
 
+
             // Use the wordpress remote post and remote body methods
             $json = wp_remote_retrieve_body( wp_remote_post( $uri, $args ) );
 
             $this->response = new Artmoi_Response( $json );
         }
-
         return $this->response();
     }
 
