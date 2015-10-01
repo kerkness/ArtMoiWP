@@ -24,6 +24,7 @@ Flight::set('flight.views.path',  dirname(__FILE__).'/views');
 Flight::register('artmoi', 'Artmoi_Request');
 Flight::register('response','Artmoi_response');
 Flight::register('controller', 'Artmoi_Controller');
+Flight::register('item', 'Artmoi_Item');
 
 
 
@@ -166,9 +167,19 @@ class ArtMoi_WP
                 'limit' => 30,
                 'orderby' => 'createdAt',
                 'orderdir' => 'descending',
+                'daterange' => '',
             ), $atts, 'am_items' );
 
+
         $controller = Flight::controller();
+
+        // Pull updated attributes from query
+        foreach($atts as $key => $value)
+        {
+            if( isset($_GET[$key]) ){
+                $atts[$key] = $_GET[$key];
+            }
+        }
 
         //error_log("Loading wordpres PostID $postId");
 
@@ -291,7 +302,16 @@ class ArtMoi_WP
         $image = Flight::controller()->searchData($postId, "image");
         $detail = Flight::controller()->searchData($postId, "detail");
 
-        return Flight::controller()->getImages($postId, $theContent,  $detail, $image, $thumbnail);
+        // Format the results into an array of Artmoi_Item objects
+        $items = array();
+
+        for( $i=0; $i < count($detail); $i ++ )
+        {
+            $items[] = Artmoi_Item::buildFromMeta($detail[$i], $image[$i], $thumbnail[$i]);
+        }
+
+//        return Flight::controller()->insertItems($postId, $theContent,  $detail, $image, $thumbnail);
+        return Flight::controller()->insertItems($postId, $theContent,  $items);
     }
 
     /**

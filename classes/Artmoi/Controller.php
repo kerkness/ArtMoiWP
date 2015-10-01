@@ -747,34 +747,42 @@ class Artmoi_Controller
      * @param $postId
      * @return string
      */
-    public function getImages($postId, $theContent, $detail, $image, $thumbnail)
+//    public function insertItems($postId, $theContent, $detail, $image, $thumbnail)
+    public function insertItems($postId, $theContent, $items)
     {
 
         $templateType = get_post_meta($postId, 'templateType', true);
-        $total = count($thumbnail);
-
+        $total = count($items);
 
         if(!($templateType == "..." || !($templateType))){
 
-            Flight::render('frontend/modal', array('details' => $detail ,
-                'images' => $image,
-                'total' => $total,
-                'thumbnailImages' => $thumbnail), 'modal');
+            Flight::render('frontend/modal', array('items' => $items ,
+                'total' => $total
+            ), 'modal');
 
-//            if($templateType == "allItems"){
-//                $alphabet = array("a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z");
-//                Flight::view()->set('alphabet', $alphabet);
-//            }
             //Fetch template with the image urls and post data
             $imageTemplate = Flight::view()->fetch("frontend/template/$templateType",
-                array('details' => $detail ,
-                    'images' => $image,
+                array('items' => $items,
                     'total' => $total,
-                    'thumbnailImages' => $thumbnail,
                 ));
 
-            return $theContent .= $imageTemplate;
+
+//            Flight::render('frontend/modal', array('details' => $detail ,
+//                'images' => $image,
+//                'total' => $total,
+//                'thumbnailImages' => $thumbnail), 'modal');
+//
+//            //Fetch template with the image urls and post data
+//            $imageTemplate = Flight::view()->fetch("frontend/template/$templateType",
+//                array('details' => $detail ,
+//                    'images' => $image,
+//                    'total' => $total,
+//                    'thumbnailImages' => $thumbnail,
+//                ));
+
+            $theContent .= $imageTemplate;
         }
+
         return $theContent;
     }
 
@@ -798,6 +806,13 @@ class Artmoi_Controller
 
         foreach ($args as $k => $v)
         {
+            error_log("Posting from wordpress with params $k = $v");
+
+            if($k == 'daterange')
+            {
+                $k = 'dateRange';
+            }
+
             $artmoi->params($k, $v);
         }
 
@@ -812,12 +827,14 @@ class Artmoi_Controller
             $templateType = 'table';
         }
 
+        $items = $response->itemResults();
+
         Flight::render('frontend/modal', array(
-            'items' => $response->results(),
+            'items' => $items,
             ), 'modal');
 
         $output = Flight::view()->fetch('frontend/template/' . $templateType, array(
-            'items' => $response->results(),
+            'items' => $items,
         ));
 
 

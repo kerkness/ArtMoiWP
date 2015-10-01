@@ -19,18 +19,18 @@ price, copyright, status, artmoiObjectId
 
 
 
-<? if ($details) : ?>
-    <? for ($i = $total-1; $i >= 0; $i--)  : ?>
+<? if ($items) : ?>
+    <? foreach ($items as $item)  : ?>
 
         <div class="col-xs-6 col-md-3">
             <div class="thumbnail">
-                <a data-toggle="modal" data-target="#myModal-<?= $details[$i]['artmoiObjectId'][0] ?>">
-                    <img src="<?= $thumbnailImages[$i] ?>">
+                <a data-toggle="modal" data-target="#myModal-<?= $item->objectId ?>">
+                    <img src="<?= $item->imageThumbnailUrl() ?>">
                 </a>
             </div>
         </div>
 
-    <?endfor?>
+    <?endforeach?>
 <?endif?>
 
 <?=$modal?>

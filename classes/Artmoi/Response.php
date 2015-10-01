@@ -98,4 +98,15 @@ class Artmoi_Response
         return false;
     }
 
+    // Convert the results data into item objects
+    public function itemResults()
+    {
+        foreach( $this->results as $i => $item )
+        {
+            $this->results[$i] = Artmoi_Item::buildFromApi($item);
+        }
+
+        return $this->results;
+    }
+
 }
