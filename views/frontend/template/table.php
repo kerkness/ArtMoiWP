@@ -3,7 +3,7 @@
         <? foreach ($items as $item)  : ?>
             <tr>
                 <td>
-                    <a data-toggle="modal" data-target="#myModal-<?= $item->objectId ?>"> <img class="artmoi-image artmoi-table" src="<?= $item->imageThumbnailUrl() ?>"> </a>
+                    <a data-toggle="modal" data-target="#myModal-<?= $item->objectId ?>" id="pointer-cursor"> <img class="artmoi-image artmoi-table" src="<?= $item->imageThumbnailUrl() ?>"> </a>
                 </td>
                 <td>
 

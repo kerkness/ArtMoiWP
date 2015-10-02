@@ -1,37 +1,4 @@
 <!--
-=========
-ALL ITEMS
-=========
--->
-<!---->
-<!--<div class="wrap bootstrap-wrapper">-->
-<!--    <h3> All Items </h3>-->
-<!---->
-<!--    <table class="table table-striped">-->
-<!--        <tr>-->
-<!--            <td style="vertical-align:middle"> All Items </td>-->
-<!---->
-<!--            <td class="text-center" style="vertical-align:middle">-->
-<!---->
-<!--                --><?// if($syncedAllItems->timestamp) : ?>
-<!--                    <span style="font-weight:bold;">-->
-<!--                        This report has been synced on --><?//= $syncedAllItems->timestamp ?>
-<!--                    </span>-->
-<!--                --><?// endif ?>
-<!--            </td>-->
-<!---->
-<!--            <td class="text-right">-->
-<!--                <a class="btn btn-default" href="admin.php?page=artmoi-view-items&pageType=all&listId=allItems&listTitle=All Items">View Items</a>-->
-<!--            </td>-->
-<!--        </tr>-->
-<!---->
-<!--    </table>-->
-<!---->
-<!--</div>-->
-
-
-
-<!--
  ========
  Reports
  ========

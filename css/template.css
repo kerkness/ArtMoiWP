@@ -14,3 +14,8 @@
     font-size: large;
     font-weight: bold;
 }
+
+
+#pointer-cursor{
+    cursor:pointer;
+}

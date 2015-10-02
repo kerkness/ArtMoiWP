@@ -510,7 +510,6 @@ class Artmoi_Controller
         // delete selected report, collection or all items group
         delete_post_meta($postId, 'syncedReportKey');
         delete_post_meta($postId, 'syncedCollectionKey');
-//        delete_post_meta($postId, 'syncedAllItemsKey');
         delete_post_meta($postId, 'artmoiPageType');
         delete_post_meta($postId, 'templateType');
 
@@ -655,7 +654,6 @@ class Artmoi_Controller
 
     }
 
-
     /**
      * Insert images from media galleries to the content
      * @param $the_content
@@ -686,7 +684,33 @@ class Artmoi_Controller
 
         return $theContent;
     }
+    public function getSingleItem ($args)
+    {
+        wp_reset_postdata();
+        global $post;
+        $postId= $post->ID;
 
+        $artmoi = Flight::artmoi();
+
+        $controller = 'creation';
+        $action = 'itemId';
+
+        $response = $artmoi->call($controller, $action);
+        $templateType = get_post_meta($postId, 'templateType', true);
+        if( ! $templateType )
+        {
+            $templateType = 'single';
+        }
+
+        $item = $response->results();
+
+        $output = Flight::view()->fetch('frontend/template/' . $templateType, array(
+            'item' => $item,
+        ));
+
+        return $output;
+
+    }
 
     public function getItems( $args )
     {

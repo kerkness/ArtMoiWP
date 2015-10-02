@@ -30,6 +30,7 @@ Flight::register('item', 'Artmoi_Item');
 
 class ArtMoi_WP
 {
+
     /**
      * constructor
      */
@@ -61,6 +62,9 @@ class ArtMoi_WP
 
         // Create Short Codes to load a real time list of items from ArtMoi
         add_shortcode('am_items', array($this, 'shortcode_items'));
+
+        // Create Short Codes to load a real time item from ArtMoi
+        add_shortcode('am_item', array($this, 'shortcode_item'));
 
         // Create Short Code for displaying an Alphabetical Menu
         add_shortcode('am_menu_alpha', array($this, 'shortcode_menu_alpha'));
@@ -181,6 +185,26 @@ class ArtMoi_WP
         //return "Shortcode ITems";
     }
 
+    public function shortcode_item($atts)
+    {
+        $controller = Flight::controller();
+
+        $item =  $controller->getSingleItem();
+        $atts = shortcode_atts(
+            array(
+                'title' => $item->title,
+                'year' => $item->year,
+                'month' => $item->month,
+                'edition' => $item->edition,
+                'formattedDate' => $item->formattedDate(),
+                'status' => $item->status->name,
+                'price' => $item->price,
+                'caption' => $item->caption,
+            ),$atts,'am_item'
+        );
+
+    }
+
     public function shortcode_menu_alpha( $atts )
     {
         $atts = shortcode_atts(
@@ -255,6 +279,12 @@ class ArtMoi_WP
      */
     public function save_meta($postId)
     {
+        // handle the case when the custom post is quick edited
+        // otherwise all custom meta fields are cleared out
+        if (wp_verify_nonce($_POST['_inline_edit'], 'inlineeditnonce'))
+        {
+            return;
+        }
         Flight::controller()->saveOrDeleteMetaValue($postId);
         $detail = Flight::controller()->searchData($postId,"detail");
 
@@ -275,7 +305,6 @@ class ArtMoi_WP
     {
         // Load style into front-end
         wp_enqueue_style('bootstrap-style', plugins_url('css/bootstrap.min.css', __FILE__));
-
         wp_enqueue_style('artmoi-theme-style', plugins_url('css/template.css', __FILE__));
 
         // Load script into front-end
@@ -318,12 +347,24 @@ class ArtMoi_WP
        Flight::controller()->addCustomMeta();
     }
 
+
     /**
      * Actions perform on activation of ArtMoi plugin
      */
     public function install_artmoi_plugin()
     {
+        $page = array(
+            'post_type' => "page",
+            'post_title' => "ArtMoi Creation Detail",
+            'post_content' => "will put something here..",
+            'post_status' => "pending",
+        );
+        $postId = wp_insert_post($page);
+
+        update_post_meta($postId,"templateType","single");
+
     }
+
 
     /**
      * Actions perform on deactivation of ArtMoi plugin
