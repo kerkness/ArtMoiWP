@@ -1,0 +1,16 @@
+.artmoi-image {
+    max-width: 280px;
+    min-width: 280px;
+}
+
+.artmoi-title {
+    margin: 0;
+}
+
+.artmoi-title {
+    margin: 0px;
+    padding: 0px 0px 5px 0px;
+    font-style: italic;
+    font-size: large;
+    font-weight: bold;
+}

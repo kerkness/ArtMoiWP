@@ -101,6 +101,7 @@ class ArtMoi_WP
         wp_enqueue_script('admin_js_bootstrap', plugins_url('ArtMoiWP/scripts/bootstrap.js'), array('jquery'));
     }
 
+
     /**
      * Load menu pages
      */
@@ -274,6 +275,8 @@ class ArtMoi_WP
     {
         // Load style into front-end
         wp_enqueue_style('bootstrap-style', plugins_url('css/bootstrap.min.css', __FILE__));
+
+        wp_enqueue_style('artmoi-theme-style', plugins_url('css/template.css', __FILE__));
 
         // Load script into front-end
         wp_enqueue_script('admin_js_bootstrap', plugins_url('ArtMoiWP/scripts/bootstrap.js'), array('jquery'));

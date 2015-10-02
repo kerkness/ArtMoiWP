@@ -160,6 +160,34 @@ class Artmoi_Item
         return $size;
     }
 
+    public function formattedDate()
+    {
+        $date = '';
+
+//        if( $this->month )
+//        {
+//            $date .= $this->month;
+//        }
+//        if( $this->month and $this->day )
+//        {
+//            $date .= ' ';
+//        }
+//        if( $this->day )
+//        {
+//            $date .= $this->day;
+//        }
+//        if( ($this->month or $this->day) and $this->year )
+//        {
+//            $date .= ' ';
+//        }
+//        if( $this->year )
+//        {
+//            $date .= $this->year;
+//        }
+
+        return $date;
+    }
+
     public function imageUrl()
     {
         return ( $this->image ) ? $this->image : $this->images[0]->imageFileSized;

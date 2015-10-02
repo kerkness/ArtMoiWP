@@ -3,14 +3,12 @@
         <? foreach ($items as $item)  : ?>
             <tr>
                 <td>
-                    <a data-toggle="modal" data-target="#myModal-<?= $item->objectId ?>"> <img src="<?= $item->imageThumbnailUrl() ?>"> </a>
+                    <a data-toggle="modal" data-target="#myModal-<?= $item->objectId ?>"> <img class="artmoi-image artmoi-table" src="<?= $item->imageThumbnailUrl() ?>"> </a>
                 </td>
                 <td>
-                    <h4 style="font-style: italic; margin:5px;"><?=$item->title?> (<?=$item->year?>) </h4>
-                    <?=$item->creator?>
-                    <?=$item->medium?>
-                    <br/>
-                    <?=$item->caption?>
+
+                    <? Flight::view()->render('frontend/template/listing', array('item' => $item)) ?>
+
                 </td>
                 <td>
                     <a class="btn btn-default" data-toggle="modal" data-target="#myModal-<?= $item->objectId ?>">Details</a>

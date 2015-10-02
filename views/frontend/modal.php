@@ -14,36 +14,8 @@
 
                         <img id="img-myModal-<?= $item->objectId ?>"/>
 
-                        <div>
+                        <? Flight::view()->render('frontend/template/listing', array('item' => $item)) ?>
 
-                            <div style="font-style: italic;">
-                                <? if ($item->title) : ?><?= $item->title ?><? else: ?> Untitled<? endif ?>
-                            </div>
-
-                            <? if( $item->edition ) : ?>
-                                <div>Edition: <?= $item->edition ?></div>
-                            <? endif ?>
-
-                            <div><? if ($item->medium) : ?>
-                                    <?= $item->medium ?>
-                                <? endif ?><? if($item->month) : ?>, <?= $item->month ?><? endif ?> <? if( $item->year ) : ?> (<?= $item->year ?>)<? endif ?></div>
-
-
-                            <? if( $item->formattedSize() ) : ?>
-                                <div>
-                                    <?= $item->formattedSize() ?>
-                                </div>
-                            <? endif ?>
-
-                            <? if (($item->status) || ($item->price)) : ?>
-                                <div><?= $item->status->name ?> <?= $item->price ?></div>
-                            <?endif?>
-
-                            <? if ($item->caption): ?>
-                                <div><?= $item->caption ?></div>
-                            <? endif ?>
-
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
