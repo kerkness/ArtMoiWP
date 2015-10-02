@@ -152,14 +152,6 @@ class ArtMoi_WP
         update_option('page_for_posts','-1');
     }
 
-    /**
-     * Sync recent creation items
-     */
-//    public function sync_creation()
-//    {
-//        Flight::controller()->syncCreation( $_POST );
-//    }
-
     public function shortcode_items( $atts )
     {
         $atts = shortcode_atts(

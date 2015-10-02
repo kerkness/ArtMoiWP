@@ -94,26 +94,6 @@ class Artmoi_Controller
     }
 
     /**
-     * display the dashboard page and recent items
-     */
-//    public function dashboard()
-//    {
-    /* recent creations  */
-    //if( $_POST['hiddenKey'] )
-    //{
-    //$postData =  json_decode(urldecode(stripslashes($_POST['objectData'][0])));
-    //print "<pre>";
-    //print_r($postData);
-    //print "</pre>";
-    //}
-
-    //Flight::view()->set('gridTitle', __('Recent Creations'));
-    //Flight::render('admin/artworkGrid', array('artwork' => $results, 'reports' => $reports), 'grid');
-    // Flight::render('admin/dashboard');
-//    }
-
-
-    /**
      * get user reports
      * @return mixed
      */
@@ -161,10 +141,6 @@ class Artmoi_Controller
         $listTitle = $_GET['listTitle'];
         $listId = $_GET['listId'];
 
-//        $page = (Flight::request()->query->page) ? Flight::request()->query->page : 0;
-//        $limit = (Flight::request()->query->limit) ? Flight::request()->query->limit : 100;
-//        $skip = (Flight::request()->query->skip) ? Flight::request()->query->skip : 0;
-
         // Get the items
         switch ($pageType) {
             case "report":
@@ -173,38 +149,13 @@ class Artmoi_Controller
             case "collection":
                 $results = $this->getCollectionItems($listId);
                 break;
-//            case "all":
-//                $results = $this->getAllItems($limit, $skip);
-//                break;
         }
-
-//        $nextSet = $skip + $limit;
 
         // Render the template
         Flight::render('admin/grid/reportGrid', array('results' => $results, 'pageType' => $pageType), 'reportGrid');
         Flight::render('admin/grid/collectionGrid', array('results' => $results, 'pageType' => $pageType), 'collectionGrid');
         Flight::render('admin/items', array('pageType' => $pageType, 'listId' => $listId, 'listTitle' => $listTitle));
     }
-
-    /**
-     * Get all Items user has and display in alphabetical order
-     * @return mixed
-     *
-     */
-//    public function getAllItems()
-//    {
-//        $artmoi = Flight::artmoi();
-//
-//        $controller = 'user';
-//        $action = 'items';
-//        $queryString = 'orderby=title&orderdir=asc';
-//
-//        // limit = 1000
-//        $response = $artmoi->call($controller, $action, NULL , $queryString);
-//        $items = $response->results();
-//
-//        return $items;
-//    }
 
     /**
      * get report Items
@@ -217,11 +168,11 @@ class Artmoi_Controller
 
         // limit is 1000
         $artmoi->params('limit', 1000);
+        $artmoi->params('orderby',"title");
 
-        $queryString = 'orderby=title';
         $controller = 'report';
         $action = $reportId;
-        $response = $artmoi->call($controller, $action, NULL, $queryString);
+        $response = $artmoi->call($controller, $action);
 
         error_log("total items # : ".count($response->results));
         return $response->results();
@@ -448,10 +399,6 @@ class Artmoi_Controller
                     $optionName = "artmoiwp_syncedCollections";
                     $listId ="collectionId"; $listName = "collectiontName";
                     break;
-//                case "all":
-//                    $optionName = "artmoiwp_allitems";
-//                    $listId = "allItemsId"; $listName = "allItemsName";
-//                    break;
             }
             $option = json_decode(get_option($optionName));
 
@@ -485,7 +432,6 @@ class Artmoi_Controller
         {
             add_meta_Box('template_type', 'ArtMoi Template', array($this,'templateMetabox'), $type, 'side', 'default');
             add_meta_Box('syncedReport_id', 'ArtMoi Reports', array($this, 'reportMetabox'), $type, 'advanced');
-//            add_meta_Box('syncedallitems', 'ArtMoi All Items Group', array($this, 'allItemsMetabox'), $type, 'advanced');
             add_meta_Box('syncedCollection_id', 'ArtMoi Collections', array($this, 'collectionMetabox'), $type, 'advanced');
         }
 
@@ -554,20 +500,6 @@ class Artmoi_Controller
         Flight::render('admin/metabox/collectionMetabox', array('collections' => $collectionResult, 'collectionChecked' => $collectionSelected, 'pageType' => "collection"));
     }
 
-//    public function allItemsMetabox($templateType)
-//    {
-//        // check allitems group is synced or not
-//        if($this->artmoiwp_allitems)
-//        {
-//            $allItems = json_encode($this->artmoiwp_allitems);
-//        }
-//
-//        $allItemsSelected = get_post_meta(get_the_ID(), 'syncedAllItemsKey', true);
-//        error_log(" is allitems group selected? :: $allItemsSelected");
-//        Flight::render('admin/metabox/allItemsMetabox', array('allItems' => $allItems, 'allItemsChecked' => $allItemsSelected,'pageType' => "allItems"));
-//    }
-
-
     /**
      * save or delete meta values from input
      * @param $post_id
@@ -598,16 +530,6 @@ class Artmoi_Controller
             $deleteValue = substr($_POST['listSelected'], 18);
             $pageType = 'collection';
         }
-
-        // When all items group is selected
-//        if (strpos($_POST['listSelected'], 'allItems') !== false)
-//        {
-//            $key = 'syncedAllItemsKey';
-//            $value = "allItems";
-//            $deleteValue = "allItems";
-//            $pageType = 'all';
-//        }
-//
 
         // Unlink
         if (strpos($_POST['listSelected'], 'delete') !== false) {
@@ -641,10 +563,9 @@ class Artmoi_Controller
         // get synced report ID or synced colleciton ID
         $reportSelected = get_post_meta($postId, 'syncedReportKey', true);
         $collectionSelected = get_post_meta($postId, 'syncedCollectionKey', true);
-        $allItemsSelected = get_post_meta($postId,'syncedAllItemsKey',true);
 
         // Check weather report or collection is selected in the edit page
-        if ($reportSelected || $collectionSelected || $allItemsSelected){
+        if ($reportSelected || $collectionSelected){
             // If report is selected..
             if ($reportSelected) {
                 $key = "artmoiReportId";
@@ -656,12 +577,6 @@ class Artmoi_Controller
                 $key = 'artmoiCollectionId';
                 $value = $collectionSelected;
             }
-
-            // If allItems group is selected..
-//            else if($allItemsSelected){
-//                $key = 'artmoiAllItemsId';
-//                $value = $allItemsSelected;
-//            }
 
             // make a query to search synced images in media
             $args = array(
@@ -766,20 +681,6 @@ class Artmoi_Controller
                     'total' => $total,
                 ));
 
-
-//            Flight::render('frontend/modal', array('details' => $detail ,
-//                'images' => $image,
-//                'total' => $total,
-//                'thumbnailImages' => $thumbnail), 'modal');
-//
-//            //Fetch template with the image urls and post data
-//            $imageTemplate = Flight::view()->fetch("frontend/template/$templateType",
-//                array('details' => $detail ,
-//                    'images' => $image,
-//                    'total' => $total,
-//                    'thumbnailImages' => $thumbnail,
-//                ));
-
             $theContent .= $imageTemplate;
         }
 
@@ -794,12 +695,7 @@ class Artmoi_Controller
         global $post;
         $postId = $post->ID; // the post ID in edit , not published
 
-
-
         $artmoi = Flight::artmoi();
-
-//        $artmoi->params('p', $page);
-//        $artmoi->params('limit', $limit);
 
         $controller = 'creation';
         $action = 'user';

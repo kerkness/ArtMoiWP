@@ -66,7 +66,10 @@ class Artmoi_Item
                 }
                 if( $key == 'tag' )
                 {
-                    $item->tags = json_decode($value);
+                    if( is_array($value) )
+                    {
+                        $item->tags = $value;
+                    }
                 }
 
                 //error_log("Artmoi_Item does not have the key $key");
@@ -149,7 +152,7 @@ class Artmoi_Item
         {
             $size .= ' x ';
         }
-        if( $this-->depth )
+        if( $this->depth )
         {
             $size .= $this->depth;
         }

@@ -3,7 +3,7 @@
         <? foreach ($items as $item)  : ?>
             <tr>
                 <td>
-                    <img src="<?= $item->imageThumbnailUrl() ?>">
+                    <a data-toggle="modal" data-target="#myModal-<?= $item->objectId ?>"> <img src="<?= $item->imageThumbnailUrl() ?>"> </a>
                 </td>
                 <td>
                     <h4 style="font-style: italic; margin:5px;"><?=$item->title?> (<?=$item->year?>) </h4>

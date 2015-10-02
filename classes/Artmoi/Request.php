@@ -70,7 +70,7 @@ class ArtMoi_Request{
      * @param null $id
      * @return Artmoi_Response
      */
-    public function call( $controller, $action = 'index', $id = NULL, $queryString = NULL )
+    public function call( $controller, $action = 'index', $id = NULL )
     {
         if( ! $controller )
         {
@@ -89,12 +89,6 @@ class ArtMoi_Request{
 
             // Build the uri
             $uri = implode('/', $uriParts);
-
-//            if($queryString){
-//             //   $query[] = $queryString;
-//                $string = "?".$queryString;
-//                $uri .= $string;
-//            }
 
             error_log("uri ".$uri);
 
