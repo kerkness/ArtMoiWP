@@ -10,10 +10,13 @@
                         <h2 class="modal-title"><? if ($item->title) : ?><?= $item->title ?><? else: ?> Untitled<? endif ?>
                         </h2>
                     </div>
+
                     <div class="modal-body">
+                        <div class="imageWrap">
+                            <img id="img-myModal-<?= $item->objectId ?>" class="mainImage center-block"/>
+                        </div>
 
-                        <img id="img-myModal-<?= $item->objectId ?>"/>
-
+                        <? Flight::view()->render('frontend/imageBox', array('item' => $item)) ?>
                         <? Flight::view()->render('frontend/template/listing', array('item' => $item)) ?>
 
                     </div>

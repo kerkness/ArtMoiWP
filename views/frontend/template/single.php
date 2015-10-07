@@ -1,2 +1,11 @@
-
-<pre><?print_r($item)?></pre>
+<div class="container">
+    <div class="col-md-5 col-xs-12">
+        <div class="imageWrap center-block row">
+            <img src="<?=$item->imageUrl()?>" class="mainImage img-responsive">
+        </div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+        <? Flight::view()->render('frontend/imageBox', array('item' => $item)) ?>
+        <? Flight::view()->render('frontend/template/listing', array('item' => $item)) ?>
+    </div>
+</div>

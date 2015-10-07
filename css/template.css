@@ -19,3 +19,27 @@
 #pointer-cursor{
     cursor:pointer;
 }
+
+.margin-top-sm{
+    margin-top:10px;
+}
+.margin-top-md{
+    margin-top:30px;
+}
+
+#map-canvas{
+    width:100%;
+    min-height:350px;
+}
+
+#map-canvas img{
+    max-width:none;
+}
+.imageWrap{
+    min-width:50px;
+    min-height:50px;
+    /*background: url('../images/loading.gif') center center no-repeat;*/
+}
+
+
+

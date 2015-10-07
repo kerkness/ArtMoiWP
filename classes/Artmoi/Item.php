@@ -2,6 +2,8 @@
 
 class Artmoi_Item
 {
+    public $item;
+
     public $images;
     public $image;
     public $thumbnail;
@@ -22,7 +24,12 @@ class Artmoi_Item
     public $copyright;
     public $posIndex;
     public $collectionId;
+
     public $address;
+    public $city;
+    public $country;
+    public $latitude;
+    public $longitude;
 
     public $width;
     public $height;
@@ -32,42 +39,32 @@ class Artmoi_Item
     public $year;
     public $month;
 
+
     public static function buildFromMeta($detail, $image, $thumbnail)
     {
         $item = new Artmoi_Item();
 
-        error_log( "build from meta/media" );
+        error_log("build from meta/media");
 
-        foreach( $detail as $key => $value )
-        {
-            if( property_exists($item, $key) )
-            {
+        foreach ($detail as $key => $value) {
+            if (property_exists($item, $key)) {
                 error_log("Settings the Key $key");
 
-                if( is_array($value) && count($value) == 1 )
-                {
+                if (is_array($value) && count($value) == 1) {
                     $item->$key = $value[0];
-                }
-                else
-                {
+                } else {
                     $item->$key = $value;
                 }
 
-            }
-            else
-            {
-                if( $key == 'artmoiObjectId' )
-                {
+            } else {
+                if ($key == 'artmoiObjectId') {
                     $item->objectId = $value[0];
                 }
-                if( $key == 'artmoiCollectionId' )
-                {
+                if ($key == 'artmoiCollectionId') {
                     $item->collectionId = $value[0];
                 }
-                if( $key == 'tag' )
-                {
-                    if( is_array($value) )
-                    {
+                if ($key == 'tag') {
+                    if (is_array($value)) {
                         $item->tags = $value;
                     }
                 }
@@ -89,48 +86,55 @@ class Artmoi_Item
 
     public static function buildFromApi($data)
     {
+
         $item = new Artmoi_Item();
 
-        foreach($data as $key => $value)
-        {
-            if( $key == 'medium' )
-            {
+        foreach ($data as $key => $value) {
+            if ($key == 'medium') {
                 $value = $value->name;
             }
 
-
-            if( property_exists($item, $key) )
-            {
+            if (property_exists($item, $key)) {
                 $item->$key = $value;
-            }
-            else
-            {
+            } else {
                 //error_log("Artmoi_Item does not have the key $key");
                 //error_log(json_encode($value));
 
-                if( $key == 'size' )
-                {
-                    $item->width = ( $value->width ) ? $value->width : 0;
-                    $item->height = ( $value->height ) ? $value->height : 0;
-                    $item->depth = ( $value->depth ) ? $value->depth : 0;
-                    $item->unit = ( $value->unit ) ? $value->unit : 0;
+                if ($key == 'creators') {
+                    $item->creator = ($value[0]->displayName) ? $value[0]->displayName : "";
+                }
+                if ($key == 'size') {
+                    $item->width = ($value->width) ? $value->width : 0;
+                    $item->height = ($value->height) ? $value->height : 0;
+                    $item->depth = ($value->depth) ? $value->depth : 0;
+                    $item->unit = ($value->units) ? $value->units->value : "";
                 }
 
-                if( $key == 'creationDate' )
-                {
+                if ($key == 'creationDate') {
                     //error_log("creation date: " . json_encode($value->year));
 
-                    $item->year = ( $value->year ) ? $value->year : '';
-                    $item->month = ( $value->month ) ? $value->month : '';
+                    $item->year = ($value->year) ? $value->year : '';
+                    $item->month = ($value->month) ? $value->month : '';
                 }
-
+                if ($key == 'location') {
+                    $item->address = ($value->address) ? $value->address : '';
+                    $item->city = ($value->city) ? $value->city : '';
+                    $item->country = ($value->country) ? $value->country : '';
+                    if ($value->geoPoint) {
+                        $item->latitude = ($value->geoPoint->latitude) ? $value->geoPoint->latitude : '';
+                        $item->longitude = ($value->geoPoint->longitude) ? $value->geoPoint->longitude : '';
+                    }
+                }
             }
+
         }
 
-        //error_log("Created item " . $item->objectId . $item->title );
+//        error_log("Created item " . $item->objectId . " " . $item->title );
 
         return $item;
     }
+
+
 
     public function formattedSize()
     {
@@ -197,5 +201,6 @@ class Artmoi_Item
     {
         return ( $this->thumbnail ) ? $this->thumbnail : $this->images[0]->imageFileThumbnail;
     }
+
 
 }

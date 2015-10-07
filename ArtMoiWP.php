@@ -60,6 +60,9 @@ class ArtMoi_WP
         // Load css into the fornt-end
         add_action('wp_enqueue_scripts',array($this,'add_style'));
 
+        // Create Short Codes to load a real time item from ArtMoi
+        add_shortcode('am_featuredCollection', array($this, 'shortcode_featuredCollection'));
+
         // Create Short Codes to load a real time list of items from ArtMoi
         add_shortcode('am_items', array($this, 'shortcode_items'));
 
@@ -148,13 +151,24 @@ class ArtMoi_WP
         register_setting('artmoiwp_apikey','artmoiwp_apikey');
         register_setting('artmoiwp_syncedReports','artmoiwp_syncedReports');
         register_setting('artmoiwp_syncedCollections','artmoiwp_syncedCollections');
-        register_setting('artmoiwp_allitems','artmoiwp_allitems');
     }
 
     public function no_limit_posts($query)
     {
         update_option('posts_per_page', '-1');
         update_option('page_for_posts','-1');
+    }
+
+    public function shortcode_featuredCollection($atts)
+    {
+        $atts = shortcode_atts(
+            array(
+                'collection' => '',
+            ), $atts, 'am_featuredCollection' );
+
+        $controller = Flight::controller();
+
+        return $controller->getFeaturedCollection($atts);
     }
 
     public function shortcode_items( $atts )
@@ -187,22 +201,17 @@ class ArtMoi_WP
 
     public function shortcode_item($atts)
     {
+        // Get the item id
+        $itemId = $_GET["item_id"];
+
+
+        // API CALL to grab the item detail
         $controller = Flight::controller();
+        $result = $controller->getSingleItem($itemId);
 
-        $item =  $controller->getSingleItem();
-        $atts = shortcode_atts(
-            array(
-                'title' => $item->title,
-                'year' => $item->year,
-                'month' => $item->month,
-                'edition' => $item->edition,
-                'formattedDate' => $item->formattedDate(),
-                'status' => $item->status->name,
-                'price' => $item->price,
-                'caption' => $item->caption,
-            ),$atts,'am_item'
-        );
+        $item = Artmoi_Item::buildFromApi($result);
 
+        return Flight::view()->render('frontend/template/single',array('item' => $item));
     }
 
     public function shortcode_menu_alpha( $atts )
@@ -353,16 +362,19 @@ class ArtMoi_WP
      */
     public function install_artmoi_plugin()
     {
+        // Insert a creation page
         $page = array(
             'post_type' => "page",
+            'post_name' =>  "am_creation",
             'post_title' => "ArtMoi Creation Detail",
-            'post_content' => "will put something here..",
-            'post_status' => "pending",
+            'post_content' => "[am_item]",
+            'post_status' => "publish",
         );
         $postId = wp_insert_post($page);
 
-        update_post_meta($postId,"templateType","single");
-
+        update_post_meta($postId,"templateType","...");
+        register_setting('artmoiwp_creationpage','artmoiwp_creationpage');
+        update_option('artmoiwp_creationpage',$postId);
     }
 
 
