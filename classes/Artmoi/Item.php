@@ -88,45 +88,46 @@ class Artmoi_Item
     {
 
         $item = new Artmoi_Item();
-
-        foreach ($data as $key => $value) {
-            if ($key == 'medium') {
-                $value = $value->name;
-            }
-
-            if (property_exists($item, $key)) {
-                $item->$key = $value;
-            } else {
-                //error_log("Artmoi_Item does not have the key $key");
-                //error_log(json_encode($value));
-
-                if ($key == 'creators') {
-                    $item->creator = ($value[0]->displayName) ? $value[0]->displayName : "";
-                }
-                if ($key == 'size') {
-                    $item->width = ($value->width) ? $value->width : 0;
-                    $item->height = ($value->height) ? $value->height : 0;
-                    $item->depth = ($value->depth) ? $value->depth : 0;
-                    $item->unit = ($value->units) ? $value->units->value : "";
+        if($data){
+            foreach ($data as $key => $value) {
+                if ($key == 'medium') {
+                    $value = $value->name;
                 }
 
-                if ($key == 'creationDate') {
-                    //error_log("creation date: " . json_encode($value->year));
+                if (property_exists($item, $key)) {
+                     $item->$key = $value;
 
-                    $item->year = ($value->year) ? $value->year : '';
-                    $item->month = ($value->month) ? $value->month : '';
-                }
-                if ($key == 'location') {
-                    $item->address = ($value->address) ? $value->address : '';
-                    $item->city = ($value->city) ? $value->city : '';
-                    $item->country = ($value->country) ? $value->country : '';
-                    if ($value->geoPoint) {
-                        $item->latitude = ($value->geoPoint->latitude) ? $value->geoPoint->latitude : '';
-                        $item->longitude = ($value->geoPoint->longitude) ? $value->geoPoint->longitude : '';
+                } else {
+                    //error_log("Artmoi_Item does not have the key $key");
+                    //error_log(json_encode($value));
+
+                    if ($key == 'creators') {
+                        $item->creator = ($value[0]->displayName) ? $value[0]->displayName : "";
+                    }
+                    if ($key == 'size') {
+                        $item->width = ($value->width) ? $value->width : 0;
+                        $item->height = ($value->height) ? $value->height : 0;
+                        $item->depth = ($value->depth) ? $value->depth : 0;
+                        $item->unit = ($value->units) ? $value->units->value : "";
+                    }
+
+                    if ($key == 'creationDate') {
+                        //error_log("creation date: " . json_encode($value->year));
+
+                        $item->year = ($value->year) ? $value->year : '';
+                        $item->month = ($value->month) ? $value->month : '';
+                    }
+                    if ($key == 'location') {
+                        $item->address = ($value->address) ? $value->address : '';
+                        $item->city = ($value->city) ? $value->city : '';
+                        $item->country = ($value->country) ? $value->country : '';
+                        if ($value->geoPoint) {
+                            $item->latitude = ($value->geoPoint->latitude) ? $value->geoPoint->latitude : '';
+                            $item->longitude = ($value->geoPoint->longitude) ? $value->geoPoint->longitude : '';
+                        }
                     }
                 }
             }
-
         }
 
 //        error_log("Created item " . $item->objectId . " " . $item->title );

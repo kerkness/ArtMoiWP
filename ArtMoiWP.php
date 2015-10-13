@@ -204,15 +204,12 @@ class ArtMoi_WP
         // Get the item id
         $itemId = $_GET["item_id"];
 
-
-        // API CALL to grab the item detail
         $controller = Flight::controller();
-        $result = $controller->getSingleItem($itemId);
 
-        $item = Artmoi_Item::buildFromApi($result);
-
-        return Flight::view()->render('frontend/template/single',array('item' => $item));
+        return $controller->getSingleItem($itemId);
     }
+
+
 
     public function shortcode_menu_alpha( $atts )
     {
@@ -304,7 +301,6 @@ class ArtMoi_WP
             Flight::controller()->addTag($postId,$detail);
         }
 
-
     }
 
     /**
@@ -352,8 +348,8 @@ class ArtMoi_WP
      */
     public function add_custom_meta()
     {
-       Flight::controller()->before();
-       Flight::controller()->addCustomMeta();
+        Flight::controller()->before();
+        Flight::controller()->addCustomMeta();
     }
 
 
@@ -372,9 +368,10 @@ class ArtMoi_WP
         );
         $postId = wp_insert_post($page);
 
-        update_post_meta($postId,"templateType","...");
+        update_post_meta($postId,"templateType","single");
         register_setting('artmoiwp_creationpage','artmoiwp_creationpage');
         update_option('artmoiwp_creationpage',$postId);
+
     }
 
 
@@ -383,6 +380,10 @@ class ArtMoi_WP
      */
     public function uninstall_artmoi_plugin()
     {
+        // Delete a creation detail page (will be in trash)
+        $creationPageId = get_option('artmoiwp_creationpage');
+        wp_delete_post($creationPageId);
+        update_option('artmoiwp_creationpage',"");
     }
 
 }

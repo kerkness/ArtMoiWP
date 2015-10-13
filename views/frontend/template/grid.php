@@ -1,5 +1,5 @@
-
 <? if ($items) : ?>
+    <div class="clearfix"></div>
     <? foreach ($items as $item)  : ?>
 
     <div class="col-xs-6 col-md-3">
@@ -11,8 +11,10 @@
     </div>
 
     <?endforeach?>
+
 <?endif?>
 
 <?=$modal?>
 
 
+<div class="clearfix"></div>

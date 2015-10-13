@@ -1,3 +1,4 @@
+<div class="clearfix"></div>
 <div class="margin-top-md">
 
     <? if($item->title) : ?>
@@ -48,3 +49,4 @@
     <?endif?>
 
 </div>
+<div class="clearfix"></div>

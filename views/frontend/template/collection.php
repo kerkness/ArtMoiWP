@@ -1,4 +1,6 @@
+
 <? if($items) : ?>
+    <div class="clearfix"></div>
     <div class="row">
         <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
         <input type="hidden" name="itemData" class="itemData" value="<?= htmlspecialchars(json_encode($items))?>" >
@@ -17,7 +19,5 @@
     </div>
 
 <? endif ?>
-
 <?=$modal?>
-
-
+<div class="clearfix"></div>

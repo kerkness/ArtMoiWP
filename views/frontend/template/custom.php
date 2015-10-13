@@ -3,23 +3,30 @@
 Customize your own template
 ============================
 
-For item details:
- $details[posIndexNumber]["infoname"][0]
 
-* infoname list:
+$item->putsomethinghere
+
+* pick something :
 title, caption, medium, address,
 year, month, creator, tag,
 width, height, depth, unit,
-price, copyright, status, artmoiObjectId
+price, copyright, status, objectId,
+city, country, latitude, longitude
 
-* artmoiObjectId is a unique image ID
-* Example (Delete the space between < and?) : <span> < ? $details[1]["creator"][0] ?> </span>
+* Size:
+formattedSize()
+* Image:
+imageUrl() , imageThumbnailUrl()
+
+* objectId is a unique item ID
+
 
 -->
 
 
 
 <? if ($items) : ?>
+    <div class="clearfix"></div>
     <? foreach ($items as $item)  : ?>
 
         <div class="col-xs-6 col-md-3">
@@ -34,4 +41,5 @@ price, copyright, status, artmoiObjectId
 
 <?=$modal?>
 
+<div class="clearfix"></div>
 

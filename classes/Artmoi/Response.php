@@ -101,16 +101,29 @@ class Artmoi_Response
     // Convert the results data into item objects
     public function itemResults()
     {
-        if($this->results->items){
-            $this->results = $this->results->items;
-        }
+        if($this->results){
 
-        foreach( $this->results as $i => $item )
-        {
-            $this->results[$i] = Artmoi_Item::buildFromApi($item);
+            if($this->results->items){
+                $this->results = $this->results->items;
+            }
+
+            foreach( $this->results as $i => $item )
+            {
+                $this->results[$i] = Artmoi_Item::buildFromApi($item);
+            }
         }
         return $this->results;
+    }
 
+    public function sigleItemResults()
+    {
+        if($this->results)
+        {
+
+            $this->results = Artmoi_Item::buildFromApi($this->results);
+
+        }
+        return $this->results;
     }
 
 }

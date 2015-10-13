@@ -1,3 +1,4 @@
+<div class="clearfix"></div>
 <?if($item->images && (count($item->images) > 1)):?>
     <div class="row margin-top-sm text-center">
     <?foreach($item->images as $image) : ?>
@@ -9,7 +10,7 @@
     <?endforeach?>
     </div>
 <?endif?>
-
+<div class="clearfix"></div>
 
 <script>
     +function ($) {

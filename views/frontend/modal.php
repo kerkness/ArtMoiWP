@@ -28,11 +28,7 @@
 
             </div>
         </div>
-
-
     <? endforeach ?>
-
-
 <? endif ?>
 
 

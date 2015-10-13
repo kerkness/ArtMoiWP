@@ -1,4 +1,5 @@
 <? if($items) : ?>
+    <div class="clearfix"></div>
     <table class="table table-striped">
         <? foreach ($items as $item)  : ?>
             <tr>
@@ -21,4 +22,4 @@
 <? endif ?>
 
 <?=$modal?>
-
+<div class="clearfix"></div>
