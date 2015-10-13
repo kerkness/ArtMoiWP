@@ -24,5 +24,3 @@
 <div class="clearfix"></div>
 
 
-
-<!--<pre>--><?//print_r($items)?><!--</pre>-->

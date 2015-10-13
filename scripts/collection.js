@@ -76,9 +76,6 @@
                 {
                     linkaddress = 'data-target="#myModal-' + markers[i][7] + '"';
                 }
-                //else{
-                //    linkaddress = 'esc_url(add_query_arg( array("page_id" => $creationPostId, "item_id" => $item->objectId)))';
-                //}
 
                 infoWindowcontent.push(['<div class="info_content">' +
                 '<a data-toggle="modal" ' + linkaddress + '>' + '<img src="' + markers[i][4] + '"></a>'

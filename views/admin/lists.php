@@ -7,17 +7,17 @@
 <div class="wrap bootstrap-wrapper">
 
     <h3> ArtMoi Reports </h3>
-    <p> Max 100 Reports</p>
+    <p> It will display maximum 100 Reports</p>
 
     <table class="table table-striped">
         <? if($reports) : ?>
             <? foreach( $reports as $report ) : ?>
                 <tr>
                     <td style="vertical-align:middle">
-                        <? if ( (strlen($report->name) < 20) ) : ?>
+                        <? if ( (strlen($report->name) < 21) ) : ?>
                             <?=$report->name?>
                         <? else : ?>
-                            <? echo substr($report->name,0,20)?>...
+                            <? echo substr($report->name,0,20)?> ...
                         <?endif?>
                     </td>
 
@@ -55,7 +55,7 @@
 <div class="wrap bootstrap-wrapper">
 
     <h3> ArtMoi Collections </h3>
-    <p>Max 100 collections </p>
+    <p> It will display Maximum 100 collections </p>
 
     <table class="table table-striped">
         <? if($collections) : ?>

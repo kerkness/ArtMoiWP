@@ -14,11 +14,9 @@ class ArtMoi_Request{
     public $apiKey;
 
     /**
-     * TODO: This needs to change to https when we have an SSL certificate for api.artmoi.me enabled
      * @var string
      */
-//    public $baseURI = 'http://api.omona.me';
-    public $baseURI = 'http://api.artmoi.me';
+    public $baseURI = 'https://api.artmoi.me';
 
     /**
      * @var string

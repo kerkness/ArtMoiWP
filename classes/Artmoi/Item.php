@@ -69,17 +69,11 @@ class Artmoi_Item
                     }
                 }
 
-                //error_log("Artmoi_Item does not have the key $key");
-                //error_log(json_encode($value));
             }
         }
 
         $item->image = $image;
         $item->thumbnail = $thumbnail;
-
-        //error_log(json_encode($detail));
-        //error_log(json_encode($image));
-        //error_log(json_encode($thumbnail));
 
         return $item;
     }
@@ -98,9 +92,6 @@ class Artmoi_Item
                      $item->$key = $value;
 
                 } else {
-                    //error_log("Artmoi_Item does not have the key $key");
-                    //error_log(json_encode($value));
-
                     if ($key == 'creators') {
                         $item->creator = ($value[0]->displayName) ? $value[0]->displayName : "";
                     }
@@ -112,11 +103,10 @@ class Artmoi_Item
                     }
 
                     if ($key == 'creationDate') {
-                        //error_log("creation date: " . json_encode($value->year));
-
                         $item->year = ($value->year) ? $value->year : '';
                         $item->month = ($value->month) ? $value->month : '';
                     }
+
                     if ($key == 'location') {
                         $item->address = ($value->address) ? $value->address : '';
                         $item->city = ($value->city) ? $value->city : '';
@@ -126,11 +116,10 @@ class Artmoi_Item
                             $item->longitude = ($value->geoPoint->longitude) ? $value->geoPoint->longitude : '';
                         }
                     }
+
                 }
             }
         }
-
-//        error_log("Created item " . $item->objectId . " " . $item->title );
 
         return $item;
     }

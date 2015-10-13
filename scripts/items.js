@@ -17,10 +17,8 @@
 
         $('.objectData').each(function( index ){
 
-            console.log( index + ": " + $(this).val() );
+            //console.log( index + ": " + $(this).val() );
             objectData = jQuery.parseJSON($(this).val());
-
-            console.log(objectData.title + " will be synced. " + objectData.objectId);
 
             $.post(ajaxurl,
                 {
@@ -52,20 +50,25 @@
                 },
 
 
-
                 function(response) {
-
                     itemsSynced++;
 
-                    if(itemsSynced == itemCount){
-                        doneSync();
+                    console.log("response : ". response);
 
-                    }
+                        if(itemsSynced == itemCount){
+                            doneSync();
+                            if (response !== -1 && response !== 0 && response !== false) {
+                                $('#error').html("<h4>successfully synced</h4>");
+                            }
+                            else{
+                                $('#error').html("<h4>Some Error occurred while syncing..</h4>")
+                            }
+                        }
 
-                    console.log("response " + response);
+                },'json')
 
-                },'json');
         });
+
 
         doneSync = function(){
             $("#syncReport").html("Sync These Items");

@@ -79,6 +79,7 @@ ArtMoi has many featured Public Art collections which can be embedded into any s
 ```
 Choose or customize an ArtMoi Template to use for these results. We recommend *collection* for featured collections.
 
+
 ###Syncing Reports and Personal Collections
 
 You may also sync ArtMoi Collections and Reports with your wordpress Media Files.

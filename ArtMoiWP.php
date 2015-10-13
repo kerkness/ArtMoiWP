@@ -60,19 +60,19 @@ class ArtMoi_WP
         // Load css into the fornt-end
         add_action('wp_enqueue_scripts',array($this,'add_style'));
 
-        // Create Short Codes to load a real time item from ArtMoi
+        // Create Short Codes to load a real time featured collection list from ArtMoi
         add_shortcode('am_featuredCollection', array($this, 'shortcode_featuredCollection'));
 
-        // Create Short Codes to load a real time list of items from ArtMoi
+        // Create Short Code to load a real time list of items from ArtMoi
         add_shortcode('am_items', array($this, 'shortcode_items'));
 
-        // Create Short Codes to load a real time item from ArtMoi
+        // Create Short Code to load a real time item from ArtMoi
         add_shortcode('am_item', array($this, 'shortcode_item'));
 
         // Create Short Code for displaying an Alphabetical Menu
         add_shortcode('am_menu_alpha', array($this, 'shortcode_menu_alpha'));
 
-        // Create Short Code for displaying an Alphabetical Menu
+        // Create Short Code for displaying an date Menu
         add_shortcode('am_menu_date', array($this, 'shortcode_menu_date'));
 
         // Add the_content filter
@@ -94,7 +94,7 @@ class ArtMoi_WP
         add_submenu_page('artmoi-lists', 'ArtMoi' . ' Lists', ' Lists', 'manage_options', 'artmoi-lists', array(__CLASS__, 'load_menu_pages'));
         add_submenu_page('artmoi-lists', 'ArtMoi' . ' Settings', 'Settings', 'manage_options', 'artmoi-settings', array(__CLASS__, 'load_menu_pages'));
 
-        // This view-report page will not in admin menu
+        // This view-report page won't be listed in admin menu
         add_submenu_page(null, 'ArtMoi' . ' Report Details', 'Report Details', 'manage_options', 'artmoi-view-items', array(__CLASS__, 'load_menu_pages'));
     }
 
@@ -153,12 +153,20 @@ class ArtMoi_WP
         register_setting('artmoiwp_syncedCollections','artmoiwp_syncedCollections');
     }
 
-    public function no_limit_posts($query)
+    /**
+     * Reset posts_per_page and page_for_posts options to display maximum 1000 items
+     */
+    public function no_limit_posts()
     {
         update_option('posts_per_page', '-1');
         update_option('page_for_posts','-1');
     }
 
+    /**
+     * Create Short Codes to load a real time featured collection list from ArtMoi
+     * @param $atts
+     * @return mixed
+     */
     public function shortcode_featuredCollection($atts)
     {
         $atts = shortcode_atts(
@@ -171,6 +179,11 @@ class ArtMoi_WP
         return $controller->getFeaturedCollection($atts);
     }
 
+    /**
+     * Create Short Code to load a real time list of items from ArtMoi
+     * @param $atts
+     * @return mixed
+     */
     public function shortcode_items( $atts )
     {
         $atts = shortcode_atts(
@@ -192,25 +205,43 @@ class ArtMoi_WP
             }
         }
 
-        //error_log("Loading wordpres PostID $postId");
-
         return $controller->getItems($atts);
 
         //return "Shortcode ITems";
     }
 
+    /**
+     * reate Short Code to load a real time item from ArtMoi
+     * @param $atts
+     * @return mixed
+     */
     public function shortcode_item($atts)
     {
-        // Get the item id
-        $itemId = $_GET["item_id"];
+        // Get item id from input
+        $atts = shortcode_atts(
+            array(
+                'item_id' => ''
+            ), $atts, 'am_item' );
+
 
         $controller = Flight::controller();
 
-        return $controller->getSingleItem($itemId);
+        foreach($atts as $key => $value)
+        {
+            // Get item id from query
+            if( isset($_GET["item_id"]) ){
+                $atts[$key] = $_GET["item_id"];
+            }
+        }
+
+        return $controller->getSingleItem($atts);
     }
 
-
-
+    /**
+     * // Create Short Code for displaying an Alphabetical Menu
+     * @param $atts
+     * @return mixed
+     */
     public function shortcode_menu_alpha( $atts )
     {
         $atts = shortcode_atts(
@@ -222,6 +253,11 @@ class ArtMoi_WP
         return Flight::view()->render('frontend/menu/alpha', array('atts' => $atts));
     }
 
+    /**
+     * // Create Short Code for displaying an date Menu
+     * @param $atts
+     * @return mixed
+     */
     public function shortcode_menu_date( $atts )
     {
         wp_reset_postdata();
@@ -256,7 +292,6 @@ class ArtMoi_WP
                 }
 
                 $dates[] = $set_start.' - '.$set_end;
-                //$dates[] = $set_end;
 
                 $last = $set_end + 1;
             }
@@ -275,7 +310,6 @@ class ArtMoi_WP
      */
     public function sync_items()
     {
-//        Flight::controller()->before();
         Flight::controller()->syncCreation( $_POST );
     }
 
@@ -339,7 +373,6 @@ class ArtMoi_WP
             $items[] = Artmoi_Item::buildFromMeta($detail[$i], $image[$i], $thumbnail[$i]);
         }
 
-//        return Flight::controller()->insertItems($postId, $theContent,  $detail, $image, $thumbnail);
         return Flight::controller()->insertItems($postId, $theContent,  $items);
     }
 
@@ -380,9 +413,9 @@ class ArtMoi_WP
      */
     public function uninstall_artmoi_plugin()
     {
-        // Delete a creation detail page (will be in trash)
+        // Delete a creation detail page
         $creationPageId = get_option('artmoiwp_creationpage');
-        wp_delete_post($creationPageId);
+        wp_delete_post($creationPageId,true); // true for force deletion
         update_option('artmoiwp_creationpage',"");
     }
 

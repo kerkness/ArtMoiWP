@@ -31,7 +31,7 @@ class Artmoi_Controller
     public $userCollections;
 
     /**
-     * Get the options
+     * Get ArtMoi options
      */
     public function before()
     {
@@ -42,7 +42,7 @@ class Artmoi_Controller
         $syncedCollections = get_option('artmoiwp_syncedCollections');
 
 
-        // Check if empty
+        // Check if exists
         if (!$syncedReports) {
             $syncedReports = '';
         }
@@ -77,7 +77,7 @@ class Artmoi_Controller
 
 
     /**
-     * display the report page
+     * Display report and collection lists
      */
     public function lists()
     {
@@ -89,11 +89,11 @@ class Artmoi_Controller
 
         Flight::view()->set('apiKey', get_option('artmoiwp_apikey'));
 
-        Flight::render('admin/lists', array('reports' => $reports, 'collections' => $collections, 'syncedReports' => $this->artmoiwp_syncedReports, 'syncedCollections' => $this->artmoiwp_syncedCollections, 'syncedAllItems' => $this->artmoiwp_allitems));
+        Flight::render('admin/lists', array('reports' => $reports, 'collections' => $collections, 'syncedReports' => $this->artmoiwp_syncedReports, 'syncedCollections' => $this->artmoiwp_syncedCollections));
     }
 
     /**
-     * get user reports
+     * Get user reports
      * @return mixed
      */
     public function getUserReports()
@@ -130,7 +130,7 @@ class Artmoi_Controller
 
 
     /**
-     * display items
+     * Display report or collection items
      */
     public function viewItems()
     {
@@ -157,7 +157,7 @@ class Artmoi_Controller
     }
 
     /**
-     * get report Items
+     * Get report Items
      * @param $reportId
      * @return mixed
      */
@@ -173,12 +173,11 @@ class Artmoi_Controller
         $action = $reportId;
         $response = $artmoi->call($controller, $action);
 
-        error_log("total items # : ".count($response->results));
         return $response->results();
     }
 
     /**
-     * get collection items
+     * Get collection items
      * @param $publicId
      * @return mixed
      */
@@ -191,27 +190,6 @@ class Artmoi_Controller
 
         $controller = 'collection';
         $action = $publicId;
-        $response = $artmoi->call($controller, $action);
-
-
-        return $response->results();
-    }
-
-    /**
-     * get recent creations
-     * @param $page
-     * @param $limit
-     * @return mixed
-     */
-    public function getRecentCreations($page, $limit)
-    {
-        $artmoi = Flight::artmoi();
-
-        $artmoi->params('p', $page);
-        $artmoi->params('limit', $limit);
-
-        $controller = 'creation';
-        $action = 'user';
         $response = $artmoi->call($controller, $action);
 
         return $response->results();
@@ -265,11 +243,10 @@ class Artmoi_Controller
                 $getObjectId = get_post_meta($postId, "artmoiObjectId", true);  // get saved image IDs
                 $getReportId = get_post_meta($postId, "artmoiReportId", true);  // get synced report IDs
                 $getCollectionId = get_post_meta($postId, "artmoiCollectionId", true); // get synced collection IDs
-                $getAllItemsId = get_post_meta($postId, "artmoiAllItemsId", true);
 
-                if ( ($objectId == $getObjectId) && (($listId == $getReportId) || ($listId == $getCollectionId) || ($listId == $getAllItemsId)) ) {
-                    error_log($objectId . " is already in media.");
-                    wp_die();
+                if ( ($objectId == $getObjectId) && (($listId == $getReportId) || ($listId == $getCollectionId)) ) {
+                    return 0;
+                    wp_die();  // this is required to terminate immediately and return a proper response
                 }
             }
         }
@@ -349,10 +326,6 @@ class Artmoi_Controller
         } elseif ($page == "collection") {
             update_post_meta($id, 'artmoiCollectionId', $listId);
         }
-//           elseif($page == "all"){
-//            update_post_meta($id, 'artmoiAllItemsId',$listId);
-//        }
-
         $src = wp_get_attachment_url($id);
 
         error_log("Wordpress media url is now $src");
@@ -363,7 +336,6 @@ class Artmoi_Controller
         echo json_encode($response);
 
         $this->saveSyncedList();
-
 
         wp_die(); // this is required to terminate immediately and return a proper response
 
@@ -401,6 +373,7 @@ class Artmoi_Controller
             }
             $option = json_decode(get_option($optionName));
 
+            // check if report or collection is already synced or not
             if(get_option($optionName)){
                 foreach($option as $syncedItem){
                     if($syncedItem->$listId == $id){
@@ -410,7 +383,7 @@ class Artmoi_Controller
                 }
             }
 
-                //add a report ID, name and timestamp to array
+            //Add a report ID, name and timestamp to array
             $option[] = array( $listId => $id, $listName => $name, "timestamp" => $timestamp);
             $this->$optionName = $option;
             update_option("$optionName", json_encode( $this->$optionName));
@@ -436,14 +409,18 @@ class Artmoi_Controller
 
     }
 
-
+    /**
+     * Display Template metabox
+     */
     public function templateMetabox()
     {
+        // Get the file list in template directory
         $directory = dirname(__FILE__).'/../../views/frontend/template';
         $scanned_directory = array_diff(scandir($directory), array('..', '.'));
 
-        foreach($scanned_directory as $file){
-            if(!(preg_match("/^\./",$file))){
+        foreach($scanned_directory as $file)
+        {
+            if(!(preg_match("/^\./",$file))){ // do not display any file starts with dot (EX: .DS_Store or .htaccess ...)
             $fileName[] = substr($file,0,-4);
             }
         }
@@ -453,14 +430,12 @@ class Artmoi_Controller
     }
 
     /**
-     *  display custom meta-boxes
-     * @param $post_id
+     * Display Report metabox
      */
     public function reportMetabox()
     {
 
         // Get synced reports list
-
         if ($this->artmoiwp_syncedReports) // Check if it's empty
         {
             $reports = $this->getUserReports();
@@ -473,12 +448,15 @@ class Artmoi_Controller
             }
         }
 
+        // Display the selected meta value
         $reportSelected = get_post_meta(get_the_ID(), 'syncedReportKey', true);
-        // Render report and collection meta boxes
-         Flight::render('admin/metabox/reportMetabox', array('reports' => $reportResult, 'reportChecked' => $reportSelected, 'pageType' => "report" ));
+
+        Flight::render('admin/metabox/reportMetabox', array('reports' => $reportResult, 'reportChecked' => $reportSelected, 'pageType' => "report" ));
     }
 
-
+    /**
+     * Display Collection metabox
+     */
     public function collectionMetabox()
     {
         // Get synced collection list
@@ -496,7 +474,7 @@ class Artmoi_Controller
             }
         }
 
-        // Check the saved meta values from input
+        // Display the selected meta value
         $collectionSelected = get_post_meta(get_the_ID(), 'syncedCollectionKey', true);
 
         Flight::render('admin/metabox/collectionMetabox', array('collections' => $collectionResult, 'collectionChecked' => $collectionSelected, 'pageType' => "collection"));
@@ -504,17 +482,14 @@ class Artmoi_Controller
 
     /**
      * save or delete meta values from input
-     * @param $post_id
+     * @param $postId
      */
     public function saveOrDeleteMetaValue($postId)
     {
-        // delete selected report, collection or all items group
-//        delete_post_meta($postId, 'syncedReportKey');
-//        delete_post_meta($postId, 'syncedCollectionKey');
-//        delete_post_meta($postId, 'artmoiPageType');
-//        delete_post_meta($postId, 'templateType');
-
-        wp_reset_postdata();
+        // delete selected report or collection
+        delete_post_meta($postId, 'syncedReportKey');
+        delete_post_meta($postId, 'syncedCollectionKey');
+        delete_post_meta($postId, 'artmoiPageType');
 
         // When report is selected
         if (strpos($_POST['listSelected'], 'report') !== false) {
@@ -549,7 +524,6 @@ class Artmoi_Controller
 
         // Save template
         if($_POST['templateSelected']){
-            error_log("template was selected for this post.. $postId : ".$_POST['templateSelected']);
             update_post_meta($postId,'templateType',$_POST['templateSelected']);
         }
 
@@ -596,7 +570,7 @@ class Artmoi_Controller
 
             $wp_query = new WP_Query($args);
 
-                // Search images have the selected report, collection or allitems group ID in media gallery
+                // Search images have the selected report or collection in media gallery
                 if ($wp_query->have_posts())
                 {
                     while ($wp_query->have_posts())
@@ -659,9 +633,10 @@ class Artmoi_Controller
 
     /**
      * Insert images from media galleries to the content
-     * @param $the_content
+     * @param $theContent
      * @param $postId
-     * @return string
+     * @param $items
+     * @return mixed
      */
     public function insertItems($postId, $theContent, $items)
     {
@@ -670,11 +645,15 @@ class Artmoi_Controller
         if( wp_is_mobile() ){
             $isMobile = true;
         }
-
+        // get selected template
         $templateType = get_post_meta($postId, 'templateType', true);
+        // get total # of items
         $total = count($items);
+        // get single creation page ID
         $this->artmoiwp_creationpage = get_option('artmoiwp_creationpage');
-        if(!($templateType == "..." || !($templateType))){
+
+
+        if(!($templateType == "..." || !$templateType )){
 
             Flight::render('frontend/modal', array('items' => $items ,
                 'total' => $total
@@ -694,34 +673,42 @@ class Artmoi_Controller
 
         return $theContent;
     }
-    public function getSingleItem ($itemId)
+
+    /**
+     * Create a shortcode for displaying one item
+     * @param $args
+     * @return mixed
+     */
+    public function getSingleItem ($args)
     {
         wp_reset_postdata();
 
         global $post;
         $postId = $post->ID;
 
+        // fixed template type...
+        update_post_meta($postId,'templateType',"single");
+
         $artmoi = Flight::artmoi();
-
         $controller = 'creation';
-        $action = $itemId;
+        $output = "";
 
-        $response = $artmoi->call($controller, $action);
-
-        $item = $response->sigleItemResults();
-
-        $templateType = get_post_meta($postId, 'templateType', true);
-
-        if( ! $templateType )
-        {
-            $templateType = 'single';
+        foreach( $args as $itemId) {
+            $action = $itemId;
+            $response = $artmoi->call($controller, $action);
+            $item = $response->sigleItemResults();
+            $output .= Flight::view()->render("frontend/template/single",array('item' => $item));
         }
 
-        $output = Flight::view()->render("frontend/template/$templateType",array('item' => $item));
 
         return $output;
     }
 
+    /**
+     * Create a shortcode to load items from ArtMoi
+     * @param $args
+     * @return mixed
+     */
     public function getItems( $args )
     {
         // Detect devices
@@ -757,11 +744,14 @@ class Artmoi_Controller
 
         $templateType = get_post_meta($postId, 'templateType', true);
 
+        // set default template type
         if( ! $templateType )
         {
             $templateType = 'table';
+            update_post_meta($postId,'templateType',"table");
         }
 
+        // create item object
         $items = $response->itemResults();
 
         Flight::render('frontend/modal', array(
@@ -777,6 +767,11 @@ class Artmoi_Controller
 
     }
 
+    /**
+     * Create a short code to load a real time list of items from ArtMoi
+     * @param $args
+     * @return mixed
+     */
     public function getFeaturedCollection($args)
     {
         // Detect devices
@@ -805,6 +800,7 @@ class Artmoi_Controller
         if( ! $templateType )
         {
             $templateType = 'collection';
+            update_post_meta($postId,'templateType',"collection");
         }
 
         $items = $response->itemResults();
@@ -818,9 +814,6 @@ class Artmoi_Controller
         $output = Flight::view()->fetch('frontend/template/' . $templateType, array(
             'items' => $items,
         ));
-
-
-        //error_log( json_encode($response->results()) );
 
         return $output;
 
