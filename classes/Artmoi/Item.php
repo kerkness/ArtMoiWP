@@ -7,6 +7,8 @@ class Artmoi_Item
     public $images;
     public $image;
     public $thumbnail;
+    public $scaledImages;
+    public $squaredImages;
 
     public $creator;
 
@@ -45,7 +47,7 @@ class Artmoi_Item
         $item = new Artmoi_Item();
 
         error_log("build from meta/media");
-        if($detail){
+        if ($detail) {
             foreach ($detail as $key => $value) {
                 if (property_exists($item, $key)) {
                     error_log("Settings the Key $key");
@@ -82,14 +84,14 @@ class Artmoi_Item
     {
 
         $item = new Artmoi_Item();
-        if($data){
+        if ($data) {
             foreach ($data as $key => $value) {
                 if ($key == 'medium') {
                     $value = $value->name;
                 }
 
                 if (property_exists($item, $key)) {
-                     $item->$key = $value;
+                    $item->$key = $value;
 
                 } else {
                     if ($key == 'creators') {
@@ -125,29 +127,23 @@ class Artmoi_Item
     }
 
 
-
     public function formattedSize()
     {
         $size = '';
 
-        if( $this->height )
-        {
+        if ($this->height) {
             $size .= $this->height;
         }
-        if( $this->height and $this->width )
-        {
+        if ($this->height and $this->width) {
             $size .= ' x ';
         }
-        if( $this->width )
-        {
+        if ($this->width) {
             $size .= $this->width;
         }
-        if( ($this->height or $this->width) and $this->depth )
-        {
+        if (($this->height or $this->width) and $this->depth) {
             $size .= ' x ';
         }
-        if( $this->depth )
-        {
+        if ($this->depth) {
             $size .= $this->depth;
         }
 
@@ -158,24 +154,19 @@ class Artmoi_Item
     {
         $date = '';
 
-        if( $this->month )
-        {
+        if ($this->month) {
             $date .= $this->month;
         }
-        if( $this->month and $this->day )
-        {
+        if ($this->month and $this->day) {
             $date .= ' ';
         }
-        if( $this->day )
-        {
+        if ($this->day) {
             $date .= $this->day;
         }
-        if( ($this->month or $this->day) and $this->year )
-        {
+        if (($this->month or $this->day) and $this->year) {
             $date .= ' ';
         }
-        if( $this->year )
-        {
+        if ($this->year) {
             $date .= $this->year;
         }
 
@@ -184,13 +175,23 @@ class Artmoi_Item
 
     public function imageUrl()
     {
-        return ( $this->image ) ? $this->image : $this->images[0]->imageFileSized;
+        return ($this->image) ? $this->image : $this->images[0]->imageFileSized;
     }
 
     public function imageThumbnailUrl()
     {
-        return ( $this->thumbnail ) ? $this->thumbnail : $this->images[0]->imageFileThumbnail;
+        return ($this->thumbnail) ? $this->thumbnail : $this->images[0]->imageFileThumbnail;
     }
 
+    public function imageScaledUrl()
+    {
+        ($this->scaledImages) ? $this->scaledimages : $this->images[0]->imageScaled300;
 
+        return $this->scaledImages;
+    }
+
+    public function imageSquaredUrl()
+    {
+        return $this->squaredImage;
+    }
 }

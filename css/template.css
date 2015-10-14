@@ -2,6 +2,9 @@
     max-width: 280px;
     min-width: 150px;
 }
+.artmoi-table-image{
+    width:30%;
+}
 
 .artmoi-title {
     margin: 0;
@@ -14,8 +17,7 @@
     font-size: large;
     font-weight: bold;
 }
-
-
+.artmoi-image
 #pointer-cursor{
     cursor:pointer;
 }

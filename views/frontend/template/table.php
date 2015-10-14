@@ -4,11 +4,10 @@
         <? foreach ($items as $item)  : ?>
             <? if($item) :  ?>
                 <tr>
-                    <td>
-                        <a data-toggle="modal"  id="pointer-cursor" <?if($isMobile == 1 || $isMobile == true) : ?>  href="<?= esc_url(add_query_arg( array('page_id' => $creationPostId, 'item_id' => $item->objectId)))?>" <?else:?> data-target="#myModal-<?= $item->objectId ?>" <?endif?>> <img class="artmoi-image artmoi-table" src="<?= $item->imageThumbnailUrl() ?>"> </a>
+                    <td class="col-md-4">
+                        <a data-toggle="modal"  id="pointer-cursor" <?if($isMobile == 1 || $isMobile == true) : ?>  href="<?= esc_url(add_query_arg( array('page_id' => $creationPostId, 'item_id' => $item->objectId)))?>" <?else:?> data-target="#myModal-<?= $item->objectId ?>" <?endif?>> <img src="<?= ($item->images[0]->imageScaled300) ? $item->images[0]->imageScaled300 : $item->imageUrl() ?>">  </a>
                     </td>
                     <td>
-
                         <? Flight::view()->render('frontend/template/listing', array('item' => $item)) ?>
 
                     </td>
