@@ -45,33 +45,33 @@ class Artmoi_Item
         $item = new Artmoi_Item();
 
         error_log("build from meta/media");
+        if($detail){
+            foreach ($detail as $key => $value) {
+                if (property_exists($item, $key)) {
+                    error_log("Settings the Key $key");
 
-        foreach ($detail as $key => $value) {
-            if (property_exists($item, $key)) {
-                error_log("Settings the Key $key");
-
-                if (is_array($value) && count($value) == 1) {
-                    $item->$key = $value[0];
-                } else {
-                    $item->$key = $value;
-                }
-
-            } else {
-                if ($key == 'artmoiObjectId') {
-                    $item->objectId = $value[0];
-                }
-                if ($key == 'artmoiCollectionId') {
-                    $item->collectionId = $value[0];
-                }
-                if ($key == 'tag') {
-                    if (is_array($value)) {
-                        $item->tags = $value;
+                    if (is_array($value) && count($value) == 1) {
+                        $item->$key = $value[0];
+                    } else {
+                        $item->$key = $value;
                     }
-                }
 
+                } else {
+                    if ($key == 'artmoiObjectId') {
+                        $item->objectId = $value[0];
+                    }
+                    if ($key == 'artmoiCollectionId') {
+                        $item->collectionId = $value[0];
+                    }
+                    if ($key == 'tag') {
+                        if (is_array($value)) {
+                            $item->tags = $value;
+                        }
+                    }
+
+                }
             }
         }
-
         $item->image = $image;
         $item->thumbnail = $thumbnail;
 
@@ -158,26 +158,26 @@ class Artmoi_Item
     {
         $date = '';
 
-//        if( $this->month )
-//        {
-//            $date .= $this->month;
-//        }
-//        if( $this->month and $this->day )
-//        {
-//            $date .= ' ';
-//        }
-//        if( $this->day )
-//        {
-//            $date .= $this->day;
-//        }
-//        if( ($this->month or $this->day) and $this->year )
-//        {
-//            $date .= ' ';
-//        }
-//        if( $this->year )
-//        {
-//            $date .= $this->year;
-//        }
+        if( $this->month )
+        {
+            $date .= $this->month;
+        }
+        if( $this->month and $this->day )
+        {
+            $date .= ' ';
+        }
+        if( $this->day )
+        {
+            $date .= $this->day;
+        }
+        if( ($this->month or $this->day) and $this->year )
+        {
+            $date .= ' ';
+        }
+        if( $this->year )
+        {
+            $date .= $this->year;
+        }
 
         return $date;
     }

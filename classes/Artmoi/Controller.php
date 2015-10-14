@@ -595,7 +595,6 @@ class Artmoi_Controller
 
                     }
                 }
-
                 switch($search)
                 {
                     case "detail":

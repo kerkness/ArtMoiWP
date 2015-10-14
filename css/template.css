@@ -1,6 +1,6 @@
 .artmoi-image {
     max-width: 280px;
-    min-width: 280px;
+    min-width: 150px;
 }
 
 .artmoi-title {
@@ -36,9 +36,11 @@
     max-width:none;
 }
 .imageWrap{
-    min-width:50px;
-    min-height:50px;
-    /*background: url('../images/loading.gif') center center no-repeat;*/
+    min-width:100px;
+    min-height:100px;
+    background: url('../images/loading.gif') no-repeat center center;
+    background-size: 100px 100px;
+    margin:50px;
 }
 
 
