@@ -723,7 +723,6 @@ class Artmoi_Controller
         $postId = $post->ID; // the post ID in edit , not published
 
         $artmoi = Flight::artmoi();
-
         $controller = 'creation';
         $action = 'user';
 

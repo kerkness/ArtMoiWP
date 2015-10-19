@@ -14,7 +14,7 @@
     margin: 0px;
     padding: 0px 0px 5px 0px;
     font-style: italic;
-    font-size: large;
+    font-size: 1.3em;
     font-weight: bold;
 }
 .artmoi-image
@@ -42,7 +42,7 @@
     min-height:100px;
     background: url('../images/loading.gif') no-repeat center center;
     background-size: 100px 100px;
-    margin:50px;
+    /*margin:50px;*/
 }
 
 
