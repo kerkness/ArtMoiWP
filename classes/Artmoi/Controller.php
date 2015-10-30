@@ -368,7 +368,7 @@ class Artmoi_Controller
                     break;
                 case "collection":
                     $optionName = "artmoiwp_syncedCollections";
-                    $listId ="collectionId"; $listName = "collectiontName";
+                    $listId ="collectionId"; $listName = "collectionName";
                     break;
             }
             $option = json_decode(get_option($optionName));
@@ -695,7 +695,7 @@ class Artmoi_Controller
         foreach( $args as $itemId) {
             $action = $itemId;
             $response = $artmoi->call($controller, $action);
-            $item = $response->sigleItemResults();
+            $item = $response->singleItemResults();
             $output .= Flight::view()->render("frontend/template/single",array('item' => $item));
         }
 

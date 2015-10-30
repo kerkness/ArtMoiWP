@@ -115,7 +115,8 @@ class Artmoi_Response
         return $this->results;
     }
 
-    public function sigleItemResults()
+    // Convert the one item data into item objects
+    public function singleItemResults()
     {
         if($this->results)
         {
