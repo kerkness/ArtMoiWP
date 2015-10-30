@@ -9,7 +9,7 @@
 
     <div class="margin-top-md">
         <? foreach ($items as $item ) : ?>
-            <? if($item) : ?>
+            <? if($item && ($item->imageUrl() || $item->imageThumbnailUrl() || $item->images[0])) :  ?>
             <!-- display items -->
             <div class="col-md-3 col-xs-6">
                 <a id="pointer-cursor" class="thumbnail" data-toggle="modal" <?if($isMobile == 1 || $isMobile == true) : ?>  href="<?= esc_url(add_query_arg( array('page_id' => $creationPostId, 'item_id' => $item->objectId)))?>" <?else:?> data-target="#myModal-<?= $item->objectId ?>" <?endif?>   >

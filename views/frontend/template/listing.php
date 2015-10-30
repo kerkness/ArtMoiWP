@@ -3,7 +3,7 @@
 
     <? if($item->title) : ?>
     <div class="artmoi-title">
-        <?=$item->title?> <? if($item->year):?>(<?=$item->year?>)<? endif ?>
+        <?=$item->title?> <? if($item->formattedDate()) : ?>(<?= $item->formattedDate() ?>)<? endif ?>
     </div>
     <? endif ?>
 
@@ -18,9 +18,6 @@
     <div>
         <? if ($item->medium) : ?>
             <?= $item->medium ?>
-        <? endif ?>
-        <? if($item->formattedDate()) : ?>
-            (<?= $item->formattedDate() ?>)
         <? endif ?>
     </div>
 
